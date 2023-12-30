@@ -1,0 +1,76 @@
+# Preface {.unnumbered}
+
+This is a Quarto book.
+
+::: {.callout-note}
+
+To learn more about Quarto books visit <https://quarto.org/docs/books>.
+
+:::
+
+## 环境配置
+
+### VS Code
+
+- 安装 VS Code
+- 安装 VS Code 插件
+  - R 扩展 - 提供 R 语言支持
+  - Quarto 扩展 - 提供 Quarto 功能
+  - Markdown 扩展 - 提供 Markdown 格式化快捷方式
+
+
+### Quarto
+
+Markdown is an easy to read and write text format:
+
+- It's _plain text_ so works well with version control
+- It can be **rendered** into HTML, PDF, and more
+- Learn more at: <https://quarto.org/docs/authoring/>
+
+
+### 配置 Python
+
+**设置 `reticulate` 运行的 Python 环境**
+
+根据 quarto 扩展的默认设置，Python 代码将通过 reticulate 来运行。如果没有安装的话需要运行 `install.packages("reticulate")` 安装它。然后使用 `use_condaenv()` 来指定需要的 Conda 环境。
+
+```{r}
+#| label: set-python
+reticulate::use_condaenv("base")
+```
+
+
+## 环境测试
+
+### Code Cell
+
+Here is a Python code cell:
+
+```{python}
+#| label: test-python-interpreter
+import os
+os.cpu_count()
+```
+
+Here is a R code chunk:
+
+```{r}
+#| label: test-r-interpreter
+plot(cars)
+```
+
+### Equation
+
+Use LaTeX to write equations:
+
+$$
+\chi' = \sum_{i=1}^n k_i s_i^2
+$$
+
+## 项目简介
+
+使用 R/Python 进行模型构建的学习笔记。
+
+- **tidymodels** 软件包的使用 <https://workshops.tidymodels.org>
+- 《数据挖掘实战》读书笔记 [@ZhangShuJuWaJueJiYuRYuYanDeShiZhan2021]
+

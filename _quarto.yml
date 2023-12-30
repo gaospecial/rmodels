@@ -1,0 +1,26 @@
+project:
+  type: book
+
+book:
+  title: "R Models"
+  author: "gaoch"
+  date: "2023/12/30"
+  chapters:
+    - index.qmd
+    - 10-tidymodels-intro.qmd
+    - 90-conclusion.qmd
+    - 95-references.qmd
+
+bibliography: [r-models-zotero.bib, references.bib]
+
+format:
+  html:
+    theme: cosmo
+    code-fold: true
+    html-math-method: katex
+  pdf:
+    documentclass: scrreprt
+  docx: default
+
+
+
