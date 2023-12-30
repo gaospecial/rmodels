@@ -1,0 +1,56 @@
+---
+title: "Hello, Models"
+author: "gaoch"
+toc: true
+number-sections: true
+highlight-style: pygments
+bibliography: rmodels.bib
+format: 
+  html: 
+    code-fold: true
+    html-math-method: katex
+  pdf: 
+    geometry: 
+      - top=30mm
+      - left=20mm
+  docx: default
+---
+
+## Markdown
+
+Markdown is an easy to read and write text format:
+
+- It's _plain text_ so works well with version control
+- It can be **rendered** into HTML, PDF, and more
+- Learn more at: <https://quarto.org/docs/authoring/>
+
+## Code Cell
+
+Here is a Python code cell:
+
+```{python}
+import os
+os.cpu_count()
+```
+
+Here is a R code chunk:
+
+```{r}
+plot(cars)
+```
+
+## Equation
+
+Use LaTeX to write equations:
+
+$$
+\chi' = \sum_{i=1}^n k_i s_i^2
+$$
+
+## 项目简介
+
+使用 R/Python 进行模型构建的学习笔记。
+
+- **tidymodels** 软件包的使用 <https://workshops.tidymodels.org>
+- 《数据挖掘实战》读书笔记 [@ZhangShuJuWaJueJiYuRYuYanDeShiZhan2021]
+
