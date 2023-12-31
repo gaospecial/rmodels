@@ -1,0 +1,373 @@
+# Basic tidymodels
+
+
+```{r}
+library(tidymodels)
+```
+
+::: {.callout-note}
+### 在继续之前，你应该
+
+-   会使用 R 语言中的管道命令 `%>%` 或者 `|>`
+-   用过这几个软件包：`dplyr`, `tidyr`, `ggplot2`
+-   了解基本的统计学概念
+-   现在不懂，但是想学习模型或者机器学习
+:::
+
+基础的 tidymodels 知识包括下面几点：
+
+- 数据预处理
+- 模型的结构
+- 模型的评价
+- 模型的调优
+
+::: {#fig-tidymodels-workflow}
+```{mermaid}
+flowchart LR
+ A(全部数据) --> B1(训练数据集)
+ A --> B2(测试数据集)
+ B1 --> F(最佳模型)
+ B1 --> C(重采样)
+ C --> D1(logistics 回归)
+ C --> D2[决策树]
+ C --> D3[随机森林]
+ D1 --> E{选择模型}
+ D2 --> E
+ D3 --> E
+ E --> F[最佳模型]
+ F --> G[验证模型性能]
+ B2 --> G
+```
+建模流程图
+:::
+
+## 安装需要的软件包
+
+安装下面的这些软件包，以便完成上面列举的任务。
+
+```{r}
+#| eval: false
+# Install the packages for the workshop
+pkgs <- 
+  c("bonsai", "doParallel", "embed", "finetune", "lightgbm", "lme4",
+    "plumber", "probably", "ranger", "rpart", "rpart.plot", "rules",
+    "splines2", "stacks", "text2vec", "textrecipes", "tidymodels", 
+    "vetiver", "remotes")
+
+pak::pak(pkgs)
+```
+
+## 数据预处理
+
+
+`modeldata` 包提供了一些示例数据集，用于在 `tidymodels` 中进行模型建设和演示。其中 "taxi" 数据集是一个简化的示例数据集，描述了芝加哥出租车司机获得小费的情况。
+
+其详细信息可以使用以下代码查看：
+
+```{r}
+library(modeldata)
+taxi
+```
+
+包含的变量有：
+
+- `tip`：乘客是否留下小费。 "yes" 或 "no"。
+- `distance`：行程距离，以英里为单位。
+- `company`：出租车公司。出现次数较少的公司被分为 "other"。
+- `local`：行程是否在同一社区区域开始和结束。
+- `dow`：行程开始的星期几。
+- `month`：行程开始的月份。
+- `hour`：行程开始的小时。
+
+这个数据一共有 10000 行。
+
+### 拆分数据
+
+在机器学习中，数据集主要分为以下几种类型：
+
+1. **训练集（Training Set）：**
+   - **定义：** 用于训练模型的数据集。
+   - **作用：** 模型通过训练集学习特征和模式，调整参数以最小化预测错误。
+
+2. **验证集（Validation Set）：**
+   - **定义：** 用于调整模型超参数、选择模型或防止过拟合的数据集。
+   - **作用：** 通过在验证集上评估模型性能，进行超参数调整和模型选择。
+
+3. **测试集（Test Set）：**
+   - **定义：** 用于评估模型在未见过的数据上的性能的数据集。
+   - **作用：** 测试集提供了模型在真实场景中的泛化能力的估计。
+
+
+使用 `initial_split()` 将数据拆分成训练集和测试集。
+
+```{r taxi-split}
+set.seed(123)
+library(rsample)
+
+# random split
+(taxi_split <- initial_split(taxi))
+
+
+# access to split data
+(taxi_train <- training(taxi_split))
+(taxi_test <- testing(taxi_split))
+```
+
+使用 `initial_validation_split()` 将数据拆分成训练集、验证集和测试集。
+
+```{r}
+set.seed(123)
+(taxi_split_2 = initial_validation_split(taxi, prop = c(0.6, 0.2)))
+
+training(taxi_split_2)
+testing(taxi_split_2)
+validation(taxi_split_2)
+```
+
+使用函数的 `strata`、`prop` 参数，以及 `initial_time_split()`、`group_initial_split()` 等函数，可以实现更科学的随机分组。
+
+## 模型的结构
+
+
+在 R 中使用 `tidymodels` 进行建模的基本步骤如下：
+
+1. **选择模型：**
+   - 选择适合任务的模型，例如线性回归、决策树、随机森林等。
+
+2. **指定引擎：**
+   - 指定模型使用的引擎，如 "lm" 或 "glmnet"。
+
+3. **设置模型模式：**
+   - 设置模型的模式，是用于分类还是回归。
+
+
+::: {.callout-note}
+**Models** have default engines.
+
+**Some** models have a default mode.
+:::
+
+```{r}
+# 使用默认引擎的逻辑回归模型
+logistic_reg()
+
+# 使用 glmnet 引擎的逻辑回归模型
+logistic_reg() %>%
+  set_engine("glmnet")
+
+# 使用 stan 引擎的逻辑回归模型
+logistic_reg() %>%
+  set_engine("stan")
+
+# 未指定模式的决策树
+decision_tree()
+
+# 指定分类模式的决策树
+decision_tree() %>% 
+  set_mode("classification")
+```
+
+::: {.callout-tip}
+All available models are listed at <https://www.tidymodels.org/find/parsnip/> 
+:::
+
+
+## 开始建模
+
+使用 2 种模型对 `taxi` 数据进行建模。
+
+* Logistic regression
+* Decision trees
+
+```{r sim-model-viz}
+#| echo: false
+
+set.seed(1)
+dat <- sim_logistic(500, ~ .1 + 2 * A)
+dat$bin <- cut(dat$A, breaks = c(seq(-3, 3, by = 1/2)), include.lowest = TRUE)
+bin_midpoints <- data.frame(A = seq(-3, 3, by = 1/2) + 0.25)
+
+rates <- 
+  dat %>% 
+  nest(.by = bin) %>% 
+  mutate(
+    probs = map(data, ~ binom.test(sum(.x$class == "one"), nrow(.x))),
+    probs = map(probs, ~ tidy(.x))
+  ) %>% 
+  select(-data) %>% 
+  unnest(cols = probs) %>% 
+  arrange(bin) %>% 
+  mutate(A = seq(-3, 3, by = 1/2) + 0.25) 
+
+plot_rates <- left_join(rates, bin_midpoints, by = join_by(A)) %>% 
+  filter(-2.5 < A, A < 3) %>% 
+  ggplot() + 
+  geom_point(aes(A, estimate)) +
+  geom_errorbar(aes(A, estimate, ymin = conf.low, ymax = conf.high), width = .25)  +
+  xlim(c(-3, 3.5)) +
+  theme_bw(base_size = 18)
+```
+
+### 逻辑回归模型
+
+逻辑回归模型将事件概率的对数几率（logit）建模为预测变量的线性组合：
+
+$$
+ \log\left(\frac{p}{1 - p}\right) = \beta_0 + \beta_1 \cdot A 
+$$
+
+在这里：
+
+- $p$ 是事件发生的概率，
+- $\beta_0$ 是截距，
+- $\beta_1$ 是与预测变量 $A$ 相关的系数。
+
+
+
+### 决策树
+
+使用决策树建模。
+
+- 基于预测变量的一系列划分或 if/then 语句：
+
+- 首先，树会在满足某些条件之前（如达到最大深度或没有更多数据时）不断地“生长”（grow）。
+
+- 然后，为了降低树的复杂性，树会被“修剪”（pruned）。
+
+```{r}
+tree_fit <- decision_tree(mode = "classification") %>% 
+  fit(class ~ A, data = mutate(dat, class = forcats::fct_rev(class)))
+
+tree_preds <- augment(tree_fit, new_data = bin_midpoints)
+
+library(rpart.plot)
+tree_fit %>%
+  extract_fit_engine() %>%
+  rpart.plot(roundint = FALSE)
+```
+
+建模的效果如下：
+
+::: {.callout-caution}
+All models are wrong, but some are useful!
+:::
+
+```{r}
+#| echo: false
+#| label: fig-model-comparison
+#| fig-cap: 逻辑回归模型与决策树的预测结果示意。（A）通过逻辑函数（S形函数），找到一条分隔两个类别的曲线。当 $p$ 大于 0.5 时，预测的类别为 1；否则，为 0。 S 形曲线的形状实现了两个类别之间的平滑过渡。（B）使用决策树建模。
+
+logistic_preds <- logistic_reg() %>% 
+  fit(class ~ A, data = dat) %>% 
+  augment(new_data = bin_midpoints) 
+
+logistic_model_plot = plot_rates +
+  geom_line(aes(A, .pred_one), color = "blue", linewidth = 2, alpha = 0.8, data = logistic_preds)
+
+tree_model_plot = plot_rates +
+  geom_step(aes(A, .pred_one), color = "green", linewidth = 2, alpha = 0.8, data = tree_preds)
+
+aplot::plot_list(logistic_model_plot, tree_model_plot, ncol = 2, labels = c("A","B"))
+```
+
+
+### 将模型整合为 workflow
+
+使用 `workflow()` 有一些明显的优势（@fig-workflow）。
+
+- Workflow 在处理新数据方面比基本的 R 工具更加灵活，尤其是在涉及新的因子水平时：这在处理分类变量时尤为重要。
+
+- 可以使用更多的数据预处理器来提取特征（在高级 tidymodels 中更多关于特征提取的内容！）
+
+- 便于同时处理多个模型。
+
+- 最重要的是，Workflow 涵盖了整个建模过程：`fit()` 和 `predict()` 不仅适用于模型拟合，还适用于预处理步骤。
+
+::: {.callout-note}
+### Workflow 如何更好地处理因子水平
+
+- 强制执行不允许在预测时出现新因子水平的规定（可以关闭）
+- 恢复在拟合时存在但在预测时缺失的因子水平
+:::
+
+![Workflows bind preprocessors and models](https://vnote-1251564393.cos.ap-chengdu.myqcloud.com/picgo/202312301710141.png){#fig-workflow}
+
+**经典方法**
+
+```{r tree-spec}
+tree_spec <-
+  decision_tree(cost_complexity = 0.002) %>% 
+  set_mode("classification")
+
+tree_spec %>% 
+  fit(tip ~ ., data = taxi_train) 
+```
+
+**workflow方法**
+
+```{r tree-wflow}
+tree_spec <-
+  decision_tree(cost_complexity = 0.002) %>% 
+  set_mode("classification")
+
+# 建立一个 workflow，同时保存模型参数，表达式和数据
+workflow() %>%
+  add_formula(tip ~ .) %>%
+  add_model(tree_spec) %>%
+  fit(data = taxi_train) 
+
+# 或者写在一起
+workflow(tip ~ ., tree_spec) %>% 
+  fit(data = taxi_train) 
+```
+
+*Edit this code to make a workflow with your own model of choice.*
+
+*Extension/Challenge: Other than formulas, what kinds of preprocessors are supported?*
+
+### 使用模型预测
+
+推荐使用 `augment()` 方法进行预测，与传统的 `predict()` 相比的差异如下。
+
+```{r}
+tree_fit <-
+  workflow(tip ~ ., tree_spec) %>% 
+  fit(data = taxi_train) 
+
+predict(tree_fit, new_data = taxi_test)
+
+augment(tree_fit, new_data = taxi_test)
+```
+
+::: {.callout-note}
+- 预测结果在一个 tibble 中；
+- 列名和数据类型更加清晰和易于理解；
+- 行数和输出结果的行数是相同的，确保了数据的对应关系。
+:::
+
+### 解释模型
+
+使用 `extract_*()` 函数提取模型 workflow 对象的组件。如 @fig-plot-tree-fit 展示了上面决策树模型的分类过程。
+
+```{r}
+#| label: fig-plot-tree-fit
+#| fig-cap: 决策树的决策过程
+library(rpart.plot)
+tree_fit %>%
+  extract_fit_engine() %>%
+  rpart.plot(roundint = FALSE)
+```
+
+
+You can use your fitted workflow for model and/or prediction explanations:
+
+-   overall variable importance, such as with the [vip](https://koalaverse.github.io/vip/) package
+
+-   flexible model explainers, such as with the [DALEXtra](https://dalex.drwhy.ai/) package
+
+
+## 模型的评价
+
+
+
+## 模型的调优

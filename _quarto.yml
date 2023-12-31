@@ -8,16 +8,29 @@ book:
   chapters:
     - index.qmd
     - 10-tidymodels-intro.qmd
+    - 11-tidymodels-basic.qmd
+    - 12-tidymodels-advanced.qmd
+    - 13-tidymodels-extra.qmd
     - 90-conclusion.qmd
     - 95-references.qmd
 
 bibliography: [r-models-zotero.bib, references.bib]
 
+knitr:
+  opts_chunk: 
+    echo: true
+    collapse: false
+    comment: "#>"
+    fig.path: "figures/"
+
 format:
   html:
     theme: cosmo
-    code-fold: true
+    code-fold: false
     html-math-method: katex
+    mermaid:
+      theme: forest
+
   pdf:
     documentclass: scrreprt
   docx: default
