@@ -368,6 +368,304 @@ You can use your fitted workflow for model and/or prediction explanations:
 
 ## 模型的评价
 
+### 模型
+
+```{r setup-previous}
+#| echo: false
+library(tidymodels)
+
+set.seed(123)
+taxi_split <- initial_split(taxi, prop = 0.8, strata = tip)
+taxi_train <- training(taxi_split)
+taxi_test <- testing(taxi_split)
+
+tree_spec <- decision_tree(cost_complexity = 0.0001, mode = "classification")
+taxi_wflow <- workflow(tip ~ ., tree_spec)
+taxi_fit <- fit(taxi_wflow, taxi_train)
+```
+
+### 混淆矩阵
+
+混淆矩阵将真实值和预测值以热图的形成呈现出来。
+
+```{r conf-mat-plot}
+#| label: fig-conf-mat-plot
+#| fig-asp: 0.5
+#| fig-cap: 混淆矩阵
+library(ggplot2)
+library(forcats)
+p1 = augment(taxi_fit, new_data = taxi_train) %>%
+  conf_mat(truth = tip, estimate = .pred_class) %>%
+  autoplot(type = "heatmap") +
+  coord_equal()
+
+# 阳性与阴性
+df = tibble(Truth = as_factor(c("yes","yes","no","no")),
+Prediction = as_factor(c("no","yes","no","yes")),
+label = c("FN","TP","TN","FP"))
+p2 = ggplot(df, aes(Truth, Prediction, label = label)) +
+geom_tile(fill = "grey90", color = "grey", linewidth = 1) +
+geom_text() +
+coord_equal() +
+theme_minimal()
+
+aplot::plot_list(p1, p2, labels = c("A","B"))
+```
+
+```{r}
+#| echo: false
+TP = 7341
+FP = 536
+FN = 43
+TN = 80
+```
+
+### 准确性
+
+根据 @eq-predict-accuracy 可以计算准确性为 `r (TP+TN)/(TP+TN+FP+FN)`。
+
+$$
+accuracy = \frac{TP + TN}{TP+FP+TN+FN}
+$$ {#eq-predict-accuracy}
+
+```{r acc}
+augment(taxi_fit, new_data = taxi_train) %>%
+  accuracy(truth = tip, estimate = .pred_class)
+```
+
+### 敏感性
+
+根据 @eq-predict-sensitivity 可以计算其数值为 `r (TP)/(TP+FN)`。
+
+
+$$
+sensitivity = \frac{TP}{TP+FP}
+$$ {#eq-predict-sensitivity}
+
+
+```{r sens}
+augment(taxi_fit, new_data = taxi_train) %>%
+  sensitivity(truth = tip, estimate = .pred_class)
+```
+
+### 特异性
+
+根据 @eq-predict-specificity 可以计算其数值为 `r (TN)/(TN+FP)`。
+
+
+$$
+sensitivity = \frac{TP}{TP+FP}
+$$ {#eq-predict-specificity}
+
+
+```{r spec}
+augment(taxi_fit, new_data = taxi_train) %>%
+  specificity(truth = tip, estimate = .pred_class)
+```
+
+::: {.callout-note}
+
+- **敏感性**告诉我们，测试有多大程度上能够捕捉到真正的阳性实例，即对于实际为阳性的样本，测试有多大可能性能够正确地识别出它们。
+- **特异性**告诉我们，测试有多大程度上能够正确地排除实际为阴性的样本，即对于实际为阴性的样本，测试有多大可能性能够正确地将它们识别为阴性。
+- **准确率**是一个综合性指标，衡量了分类模型对于所有样本的整体预测准确性。具体而言，它表示模型正确预测的样本在所有样本中的比例。
+
+:::
+
+使用 `metric_set()` 可以一次获取多个指标（另见 @fig-thresholds）。
+
+```{r taxi-metrics}
+taxi_metrics <- metric_set(accuracy, specificity, sensitivity)
+
+augment(taxi_fit, new_data = taxi_train) %>%
+  taxi_metrics(truth = tip, estimate = .pred_class)
+```
+
+
+
+```{r}
+#| label: fig-thresholds
+#| echo: false
+#| fig-cap: 敏感性和特异性通常是一对矛盾的指标，即提高敏感性可能会降低特异性，反之亦然。在实际应用中，选择哪个指标更重要取决于具体的问题和应用背景。
+
+augment(taxi_fit, new_data = taxi_train) %>% 
+  roc_curve(truth = tip, .pred_yes) %>% 
+  filter(is.finite(.threshold)) %>% 
+  pivot_longer(c(specificity, sensitivity), names_to = "statistic", values_to = "value") %>% 
+  rename(`event threshold` = .threshold) %>% 
+  ggplot(aes(x = `event threshold`, y = value, col = statistic, group = statistic)) + 
+  geom_line() +
+  scale_color_brewer(palette = "Dark2") +
+  labs(y = NULL) +
+  coord_equal() +
+  theme_bw() +
+  theme(legend.position = "top")
+```
+
+### ROC 曲线
+
+ROC（Receiver Operating Characteristic）曲线是一种用于评估二分类模型性能的图形工具。以下是关于ROC曲线的定义和解释：
+
+1. **定义**：
+
+   - ROC曲线是一种以假正例率（False Positive Rate，FPR）为横轴、真正例率（True Positive Rate，TPR或敏感性）为纵轴的图形。它显示了在不同阈值下，模型的真正例率和假正例率之间的权衡关系。
+
+2. **绘制方式**：
+
+   - 在ROC曲线中，横轴表示FPR，纵轴表示TPR。模型的输出概率或分数被用作不同阈值，从而生成一系列的TPR和FPR值。
+
+3. **解释**：
+
+   - ROC曲线能够展示在不同分类阈值下，模型在识别正例（阳性类别）和负例（阴性类别）方面的性能。理想情况下，ROC曲线越靠近左上角，模型性能越好，因为在那里，TPR较高而FPR较低。
+
+4. **AUC值**：
+
+   - ROC曲线下的面积（Area Under the Curve，AUC）也是一个常用的性能度量。AUC值越接近1，表示模型性能越好。AUC值为0.5时，表示模型的性能等同于随机猜测。
+
+5. **示例**：
+
+   - 一个理想的ROC曲线会沿着左上角的边缘，最终达到（0, 1）点。一般情况下，ROC曲线在图形上是向左上凸起的。
+
+在实际应用中，ROC曲线和AUC值是评估分类模型性能的重要工具，尤其在处理不同类别分布和不同阈值的情况下。
+
+given that sensitivity is the true positive rate, and specificity is the true negative rate. Hence `1 - specificity` is the false positive rate.
+
+We can use the area under the ROC curve as a classification metric: 
+
+- ROC AUC = 1 💯 
+- ROC AUC = 1/2 😢
+
+```{r roc-auc}
+# Assumes _first_ factor level is event; there are options to change that
+augment(taxi_fit, new_data = taxi_train) %>% 
+  roc_curve(truth = tip, .pred_yes) %>%
+  slice(1, 20, 50)
+
+augment(taxi_fit, new_data = taxi_train) %>% 
+  roc_auc(truth = tip, .pred_yes)
+```
+
+@fig-taxi-fit-roc-curve 显示了上面这个模型的 ROC 曲线。
+
+```{r fig-taxi-fit-roc-curve}
+#| label: fig-taxi-fit-roc-curve
+#| fig-cap: 这个模型的 ROC AUC 值为 0.691。
+augment(taxi_fit, new_data = taxi_train) %>% 
+  roc_curve(truth = tip, .pred_yes) %>%
+  autoplot()
+```
+
+
+### 过拟合
+
+将训练得到的模型分别用于训练数据集和测试数据集，比较二者预测的准确率，可以发现预测训练数据集的结果优于测试数据集。这就是模型的过拟合现象（@fig-over-fitting）。
+
+![过拟合](https://raw.githubusercontent.com/topepo/2022-nyr-workshop/main/images/tuning-overfitting-test-1.svg){#fig-over-fitting}
+
+首先，比较一下模型的准确性指标。
+
+```{r}
+# 模型预测训练数据集
+taxi_fit %>%
+  augment(taxi_train) %>%
+  accuracy(tip, .pred_class)
+
+# 模型预测测试数据集
+taxi_fit %>%
+  augment(taxi_test) %>%
+  accuracy(tip, .pred_class)
+```
+
+其次，比较一下 Brier 分数。
+
+```{r brier-class}
+taxi_fit %>%
+  augment(taxi_train) %>%
+  brier_class(tip, .pred_yes)
+
+taxi_fit %>%
+  augment(taxi_test) %>%
+  brier_class(tip, .pred_yes)
+```
+
+Brier分数（Brier Score）是一种用于评估分类模型性能的指标。对于二分类问题，Brier分数的计算公式如下：
+
+$$
+Brier\ Score = \frac{1}{N} \sum_{i=1}^{N} (f_i - o_i)^2
+$$
+
+其中：
+- $N$ 是样本数；
+- $f_i$ 是模型对事件发生的概率的预测值；
+- $o_i$ 是实际观测到的二分类结果，取值为0或1（例如，事件未发生为0，事件发生为1）。
+
+Brier分数的取值范围在0到1之间，0表示完美预测，1表示最差的预测。较低的Brier分数表示模型对观测结果的概率预测更准确。所以，仍然可以发现模型过拟合的现象。
+
+### 交叉验证
+
+在不使用测试数据集的前提下，能不能比较模型的参数？这就要用到交叉验证。`vfold_cv()` 函数默认将训练数据集中的十分之一（`v = 10`）取出来，用于计算、比较模型的性能参数。
+
+```{r taxi-folds}
+set.seed(123)
+taxi_folds <- vfold_cv(taxi_train, v = 10, strata = tip)
+taxi_folds
+```
+
+使用 `fit_resamples()` 函数来对多次取样的数据进行拟合，使用 `collect_mertics()` 评价模型的性能。
+
+```{r fit-resamples}
+taxi_res <- fit_resamples(taxi_wflow, taxi_folds)
+taxi_res
+```
+
+```{r collect-metrics}
+taxi_res %>%
+  collect_metrics()
+```
+
+::: {.callout-note}
+`collect_metrics()` is one of a suite of `collect_*()` functions that can be used to work with columns of tuning results. Most columns in a tuning result prefixed with `.` have a corresponding `collect_*()` function with options for common summaries.
+:::
+
+交叉验证通过重采样和性能比较，使得我们可以在仅使用训练集就可以可靠地比较模型的性能。
+
+::: {.callout-warning}
+记住：
+
+- 训练集会给出过于乐观的指标
+- 测试集非常宝贵
+:::
+
+
+```{r save-predictions}
+# Save the assessment set results
+ctrl_taxi <- control_resamples(save_pred = TRUE)
+taxi_res <- fit_resamples(taxi_wflow, taxi_folds, control = ctrl_taxi)
+
+taxi_res
+
+# Save the assessment set results
+taxi_preds <- collect_predictions(taxi_res)
+taxi_preds
+
+# Evaluating model performance
+taxi_preds %>% 
+  group_by(id) %>%
+  taxi_metrics(truth = tip, estimate = .pred_class)
+
+taxi_res
+```
+
+交叉验证的蒙特卡洛方法，以及创建验证数据集。
+
+```{r mc-cv}
+set.seed(322)
+# use the Monte Carlo Cross-Validation
+mc_cv(taxi_train, times = 10)
+
+# create validation set
+taxi_val_split <- initial_validation_split(taxi, strata = tip)
+validation_set(taxi_val_split)
+```
 
 
 ## 模型的调优
