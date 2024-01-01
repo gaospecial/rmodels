@@ -368,7 +368,7 @@ You can use your fitted workflow for model and/or prediction explanations:
 
 ## 模型的评价
 
-### 模型
+先训练一个决策树模型，然后再评价该模型的性能。
 
 ```{r setup-previous}
 #| echo: false
@@ -667,5 +667,187 @@ taxi_val_split <- initial_validation_split(taxi, strata = tip)
 validation_set(taxi_val_split)
 ```
 
+## 随机森林模型
+
+在了解了模型评价指标之后，我们再建一个随机森林模型，看看这个模型的性能是不是会优于决策树。
+
+随机森林（Random Forest）是一种集成学习（Ensemble Learning）方法，用于解决分类和回归问题。它建立在决策树的基础上，通过构建多个决策树并结合它们的预测结果来提高模型的性能和鲁棒性。
+
+以下是随机森林模型的主要特点和工作原理：
+
+1. **决策树基学习器：** 随机森林由多个决策树组成。每个决策树都是独立训练的，采用不同的随机子集数据。这有助于防止过拟合，增加模型的泛化能力。
+
+2. **随机子集（Bootstrap抽样）：** 在训练每个决策树时，随机森林使用自助抽样（Bootstrap Sampling）从训练集中随机选择一个子集。这意味着每个决策树的训练数据都是从原始训练集中有放回地随机抽取的。
+
+3. **随机特征选择：** 在每个决策树的节点上，随机森林只考虑特征的随机子集进行划分。这样做有助于确保每个决策树的多样性，防止所有决策树过于相似。
+
+4. **投票机制：** 对于分类问题，随机森林通过多数投票原则（Majority Voting）来确定最终的分类结果。对于回归问题，随机森林取多个决策树的平均预测结果。
+
+5. **高性能和鲁棒性：** 随机森林通常对于各种类型的数据和问题都表现得很好。它们能够处理大量特征和样本，具有较强的鲁棒性，对于处理噪声和复杂关系也有良好的适应性。
+
+随机森林的主要优势在于其简单而强大的集成学习策略，能够有效地降低过拟合风险，并在许多实际应用中表现优异。由于其可解释性、鲁棒性和高性能，随机森林成为了许多数据科学和机器学习问题的首选模型之一。
+
+Bootstrap aggregating，通常简称为 Bagging，是一种集成学习的方法，旨在提高模型的稳定性和准确性。它的核心思想是通过对原始数据集进行自助抽样（Bootstrap Sampling），创建多个数据子集，然后分别训练多个模型，最后将它们的预测结果进行组合。
+
+下面使用随机森林模型建模，并检查得到模型的性能指标。
+
+```{r}
+#| label: rand-forest
+# initialize a random forest model
+rf_spec <- rand_forest(trees = 1000, mode = "classification")
+rf_spec
+
+# Create a random forest model (workflow)
+rf_wflow <- workflow(tip ~ ., rf_spec)
+rf_wflow
+
+ctrl_taxi <- control_resamples(save_pred = TRUE)
+
+# Random forest uses random numbers so set the seed first
+set.seed(2)
+taxi_folds = vfold_cv(taxi_train, strata = tip)
+rf_res <- fit_resamples(rf_wflow, taxi_folds, control = ctrl_taxi)
+collect_metrics(rf_res)
+
+# taxi_split has train + test info
+final_fit <- last_fit(rf_wflow, taxi_split) 
+final_fit
+
+## What is in final_fit
+collect_metrics(final_fit)
+
+# metrics computed with the test set
+collect_predictions(final_fit)
+
+## What is in final_fit
+extract_workflow(final_fit)
+```
+
 
 ## 模型的调优
+
+### 为什么要调优？
+
+模型调整（tuning）是机器学习中的一个重要步骤，主要出于以下几个原因：
+
+1. **提高模型性能**：调整模型参数可以帮助我们找到最优的参数组合，从而使模型在特定任务上实现最佳性能。
+
+2. **避免过拟合和欠拟合**：通过适当的模型调整，我们可以平衡模型的偏差和方差，避免过拟合（模型在训练数据上表现良好，但在测试数据上表现差）和欠拟合（模型在训练数据和测试数据上的表现都不好）。
+
+3. **适应不同的数据分布**：不同的数据集有其特异性，可能需要不同的参数配置才能达到较好的效果。通过模型调度，我们可以针对具体的数据集优化模型。
+
+4. **增加模型的泛化能力**：通过合理的参数设置，可以使模型对未知数据有更好的预测能力。
+
+### 适用的情况
+
+模型调优主要适用于以下几种情况：
+
+1. **模型性能不佳**：当模型的预测结果或分类效果不尽如人意时，我们需要对模型进行调优以提升其性能。
+
+2. **数据集特性变化**：当我们处理的数据集有显著的特性变化（例如特征分布改变，噪声增加等）时，我们需要对原有模型进行调整以适应新的数据特性。
+
+3. **模型过拟合或欠拟合**：当模型在训练集上表现良好，但在测试集上表现较差（过拟合），或者模型在训练集和测试集上的表现都不佳（欠拟合）时，我们需要通过调整模型参数来解决这些问题。
+
+4. **初始参数设置不合理**：如果模型的初始参数设置并不合适，可能会导致模型的学习效率较低或者无法到达最优解，此时需要对模型进行调优。
+
+5. **针对特定任务优化模型**：当我们希望模型在某个特定任务上有更好的表现时，我们可以对模型做针对性的调优。
+
+总的来说，只要是希望提升模型性能，适应数据变化，或者解决模型的过拟合和欠拟合问题，我们都可以通过模型调优来实现。
+
+### 常见策略
+
+最常见的模型调优策略主要有以下几种：
+
+1. **网格搜索（Grid Search）**：这是一种穷举搜索的方法，我们为每一个参数设定一组值，然后通过遍历每个参数可能的组合来寻找最优解。
+
+2. **随机搜索（Random Search）**：不同于网格搜索的穷举性质，它在每个参数的可能值中随机选取一部分进行组合，然后从这些组合中寻找最优解。
+
+3. **手动搜索（Manual Search）**：也称为人工搜索，即由研究者根据经验或者对问题的理解，手动设定并调整参数。这种方式需要有一定的专业知识和经验，但在某些情况下可能会找到更好的解。
+
+4. **自动化搜索（Automated Search）**：这类方法，如贝叶斯优化、遗传算法等，使用算法自动寻找最优参数组合。相比前面几种方法，这些方法可以在更大的范围内寻找最优参数，并且节省了人工参与调整的时间。
+
+以上就是目前最常用的模型调优策略，选择哪种策略依赖于具体的需求、问题复杂度以及可用资源。
+
+### 调优模型
+
+`tune_grid()` works similar to `fit_resamples()` but covers multiple parameter values:
+
+```{r}
+#| label: tag-for-tuning
+#| code-line-numbers: "1|"
+
+rf_spec <- rand_forest(min_n = tune()) %>% 
+  set_mode("classification")
+
+rf_wflow <- workflow(tip ~ ., rf_spec)
+rf_wflow
+
+
+## Try out multiple values
+set.seed(22)
+rf_res <- tune_grid(
+  rf_wflow,
+  taxi_folds,
+  grid = 5
+)
+
+## Compare results
+# Inspecting results and selecting the best-performing hyperparameter(s):
+show_best(rf_res)
+
+best_parameter <- select_best(rf_res)
+best_parameter
+
+
+## The final fit
+(rf_wflow <- finalize_workflow(rf_wflow, best_parameter))
+(final_fit <- last_fit(rf_wflow, taxi_split))
+collect_metrics(final_fit)
+```
+
+
+这段代码是在使用 `tidymodels` 包中的函数进行随机森林模型的参数调优和最后的拟合。下面是对各个部分的解释：
+
+1. `rf_spec <- rand_forest(min_n = tune()) %>% set_mode("classification")`
+
+   这行代码定义了一个随机森林分类器，并设定 `min_n` 参数为待调整的参数。
+
+2. `rf_wflow <- workflow(tip ~ ., rf_spec)`
+
+   这行代码创建了一个工作流，将特征和模型规格结合起来。
+
+3. `rf_res <- tune_grid(rf_wflow, taxi_folds, grid = 5)`
+
+   这行代码使用 `tune_grid` 函数在预定义的交叉验证折叠 `taxi_folds` 上进行网格搜索，尝试 `grid=5` 指定的不同的 `min_n` 参数值。
+
+4. `show_best(rf_res)`
+
+   这行代码显示了最佳性能的模型参数。
+
+5. `best_parameter <- select_best(rf_res)`
+
+   这行代码选择出表现最好的模型参数。
+
+6. `rf_wflow <- finalize_workflow(rf_wflow, best_parameter)`
+
+   这行代码将最佳参数设置到工作流中。
+
+7. `final_fit <- last_fit(rf_wflow, taxi_split)`
+
+   这行代码在训练集上用确定的最佳参数进行最后的模型拟合。
+
+8. `collect_metrics(final_fit)`
+
+   这行代码收集并显示最终模型在训练集和测试集上的性能指标。
+
+
+## 参考资料
+
+- <https://www.tidymodels.org/>
+
+- <https://www.tmwr.org/>
+
+- <http://www.feat.engineering/>
+
+- <https://smltar.com/>
+
