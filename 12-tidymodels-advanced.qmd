@@ -88,7 +88,9 @@ options(
   pillar.advice = FALSE, 
   pillar.min_title_chars = Inf
 )
+```
 
+```{r}
 # data-import
 data(hotel_rates)
 set.seed(295)
