@@ -1,0 +1,43 @@
+# Example of tidymodels 
+
+## 预测光谱数据的实例
+
+`tidymodels`是一组用于建立统计和机器学习模型的R包，它可以处理各种类型的数据，包括光谱数据。以下是一个简单的示例，说明如何使用主成分分析（PCA）和随机森林回归在`tidymodels`中对光谱数据进行预测。
+
+```{r}
+# 加载必要的包
+library(tidymodels)
+library(tidyverse)
+
+# 假设我们有一个名为spectra的数据框，其中有100列表示光谱特征，最后一列是我们想要预测的响应变量
+set.seed(123)
+spectra <- as_tibble(matrix(rnorm(10000), ncol = 100))
+spectra$response <- with(spectra, V1 * 2 + V2 ^ 2 + rnorm(nrow(spectra)))
+
+# 划分训练集和测试集
+split <- initial_split(spectra, prop = 3/4)
+train_data <- training(split)
+test_data <- testing(split)
+
+# 定义PCA预处理步骤和随机森林规范
+pca_recipe <- recipe(response ~ ., data = train_data) %>%
+  step_normalize(all_predictors()) %>%
+  step_pca(all_predictors())
+
+rf_spec <- rand_forest() %>% set_engine("randomForest", importance = TRUE)  |> 
+    set_mode("regression")
+
+# 定义工作流
+rf_workflow <- workflow() %>% add_model(rf_spec) %>% add_recipe(pca_recipe)
+
+# 训练模型
+rf_fit <- fit(rf_workflow, data = train_data)
+
+# 进行预测
+predictions <- rf_fit %>% predict(test_data) %>% bind_cols(test_data)
+predictions %>% show()
+```
+
+在这个例子中，我们首先生成了一个模拟的光谱数据集，然后执行主成分分析以减少数据的维数，最后使用随机森林进行预测。`tidymodels`提供了许多其他的预处理步骤和模型规范，你可以根据自己的需求进行选择和调整。
+
+需要注意的是，对于光谱数据，因为特征数量通常很大（可能达到上千或更多），所以一般需要进行降维或者特征选择，而且也需要选择能够处理高维数据的模型。

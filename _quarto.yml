@@ -11,6 +11,8 @@ book:
     - 11-tidymodels-basic.qmd
     - 12-tidymodels-advanced.qmd
     - 13-tidymodels-extra.qmd
+    - 20-data-mining.qmd
+    - 30-tidymodels-example.qmd
     - 90-conclusion.qmd
     - 95-references.qmd
 
