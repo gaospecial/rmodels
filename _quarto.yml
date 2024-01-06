@@ -7,13 +7,18 @@ book:
   date: "2023/12/30"
   chapters:
     - index.qmd
-    - 10-tidymodels-intro.qmd
-    - 11-tidymodels-basic.qmd
-    - 12-tidymodels-advanced.qmd
-    - 13-tidymodels-extra.qmd
-    - 20-data-mining.qmd
-    - 30-tidymodels-example.qmd
-    - 90-conclusion.qmd
+    - part: 10-tidymodels-intro.qmd
+      chapters: 
+        - 11-tidymodels-basic.qmd
+        - 12-tidymodels-advanced.qmd
+        - 13-tidymodels-extra.qmd 
+        - 30-tidymodels-example.qmd
+    - part: 20-data-mining.qmd
+      chapters: 
+        - 21.house-price-pred-lm.qmd
+        - 22.insurance-predict.qmd
+    - part: 90-conclusion.qmd
+  appendices: 
     - 95-references.qmd
 
 bibliography: [r-models-zotero.bib, references.bib]
@@ -35,6 +40,13 @@ format:
 
   pdf:
     documentclass: scrreprt
+    include-in-header: 
+      text: |
+        \usepackage{makeidx}
+        \makeindex
+    include-after-body: 
+      text: |
+        \printindex
   docx: default
 
 
