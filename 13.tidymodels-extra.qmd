@@ -1,0 +1,206 @@
+# Extra tidymodels
+
+## 部署模型
+
+使用 `vetiver` 包可以快速实现模型部署。
+
+这段代码包含了几个主要步骤：
+
+1. **数据集的划分**：使用`tidymodels`包中的`initial_split()`函数将`taxi`数据集划分为训练集和测试集，其中80%的数据用于训练，剩余20%的数据用于测试。这个划分是根据`tip`列（应该是目标变量）进行分层的。
+
+```{r}
+library(tidymodels)
+
+set.seed(123)
+taxi_split <- initial_split(taxi, prop = 0.8, strata = tip)
+taxi_train <- training(taxi_split)
+taxi_test <- testing(taxi_split)
+```
+
+2. **模型的定义和训练**：定义了一个决策树模型规格（使用`decision_tree()`函数），并设置了成本复杂度参数为0.0001，模式为"分类"。然后，使用`workflow()`函数创建了一个工作流，指定了目标变量和预测器，并用训练集拟合了这个工作流。
+
+```{r}
+tree_spec <- decision_tree(cost_complexity = 0.0001, mode = "classification")
+tree_fit <- workflow(tip ~ ., tree_spec) %>% fit(taxi_train)
+```
+
+3. **模型部署准备**：使用`vetiver`包的`vetiver_model()`函数创建了一个`vetiver`模型对象，这是对已经拟合的模型进行封装，为模型的部署做准备。
+
+
+```{r}
+## Deploying a model
+library(vetiver)
+v <- vetiver_model(tree_fit, "taxi")
+v
+```
+
+4. **建立API**：使用`plumber`包提供的`pr()`函数创建了一个新的Plumber API，然后利用`vetiver_api(v)`将`vetiver`模型对象转化为一个API端点。这样就可以通过这个API来调用我们的机器学习模型。
+
+```{r}
+## Deploy your model
+library(plumber)
+pr() %>%
+  vetiver_api(v)
+```
+
+以上就是代码的基本解释。如果你想要实际部署这个模型，你需要将这个Plumber API部署到一个可以提供HTTP服务的服务器上，例如 RStudio Connect。
+
+
+## 编码的影响
+
+这段代码执行了以下操作：
+
+**数据预处理**: 你加载了一个叫做`hotel_rates`的数据集，并从中随机选择了5000行。然后，你对这个数据集进行了一些预处理，包括去除`arrival_date`列，以及将`company`、`country`和`agent`列转换为因子类型。
+
+```{r}
+data(hotel_rates)
+set.seed(295)
+hotel_rates <- 
+  hotel_rates %>% 
+  sample_n(5000) %>% 
+  arrange(arrival_date) %>% 
+  select(-arrival_date) %>% 
+  mutate(
+    company = factor(as.character(company)),
+    country = factor(as.character(country)),
+    agent = factor(as.character(agent))
+  )
+```
+
+
+**数据划分**: 你使用`tidymodels`包的`initial_split()`函数将数据集划分为训练集和测试集，其中划分是基于`avg_price_per_room`列进行的。
+
+```{r}
+set.seed(4028)
+hotel_split <-
+  initial_split(hotel_rates, strata = avg_price_per_room)
+
+hotel_train <- training(hotel_split)
+hotel_test <- testing(hotel_split)
+```
+
+**交叉验证**: 你设置了一个10折交叉验证（默认设置）的数据集，也是基于`avg_price_per_room`列进行的。
+
+```{r}
+set.seed(472)
+hotel_rs <- vfold_cv(hotel_train, strata = avg_price_per_room)
+```
+
+**特征工程**: 你计算了每个代理的平均房价(ADR)和预订数量。然后，你使用了`embed`包的`step_lencode_mixed()`函数来对`agent`列进行混合编码。这个函数根据目标变量的值来计算每个级别的概率，并用这个概率来替换原始的分类变量。
+
+```{r}
+agent_stats <- 
+  hotel_train %>%
+  group_by(agent) %>%
+  summarize(
+    ADR = mean(avg_price_per_room), 
+    num_reservations = n(),
+    .groups = "drop"
+    ) %>%
+  mutate(agent = reorder(agent, ADR))
+
+library(embed)
+
+estimates <- 
+  recipe(avg_price_per_room ~ ., data = hotel_train) %>% 
+  step_lencode_mixed(agent, outcome = vars(avg_price_per_room), id = "encoding") %>%
+  step_dummy(all_nominal_predictors()) %>% 
+  step_zv(all_predictors()) %>% 
+  step_normalize(all_numeric_predictors()) %>% 
+  prep() %>% 
+  tidy(id = "encoding") %>% 
+  select(agent = level, estimate = value)
+```
+
+为了得到 `estimates` 的值，依次执行了以下操作：
+
+1. **创建预处理配方**：使用`recipe()`函数创建一个预处理配方，指定要根据所有其他变量来预测的目标`avg_price_per_room`。
+
+2. **混合编码**：使用`step_lencode_mixed()`函数对`agent`进行混合编码。这个函数会计算每个级别的效应大小，并用这个效应大小替换原始分类变量的值。这是一种处理分类变量的方法，可以将分类变量的每个级别与目标变量的某种统计量（如均值）关联起来。
+
+3. **哑变量编码**：使用`step_dummy()`函数对所有的名义预测变量进行哑变量编码。这会为每个分类变量的每个级别创建一个新的二元变量。
+
+4. **移除零方差预测变量**：使用`step_zv()`函数移除所有的零方差预测变量。这些变量在所有观测中的值都是相同的，因此不包含任何有用的信息。
+
+5. **归一化**：使用`step_normalize()`函数对所有的数值预测变量进行归一化。这会将每个变量的值转换为其Z分数，即减去均值然后除以标准差。
+
+6. **准备配方**：使用`prep()`函数准备（即训练）这个配方。这会使配方学习到训练数据的特性，例如各变量的均值和标准差等。
+
+7. **提取编码估计值**：使用`tidy()`函数和`select()`函数提取混合编码的估计值，并将结果保存在`estimates`中。这个数据框包含两列：`agent`（原始的级别）和`estimate`（对应的效应大小）。
+
+8. **模型训练与评估**: 你定义了一个线性回归模型，并在上面应用了你的预处理步骤。然后，你在交叉验证的数据集上拟合了这个模型，并收集了每个折叠的度量结果。
+
+
+```{r}
+hotel_effect_rec <-
+  recipe(avg_price_per_room ~ ., data = hotel_train) %>% 
+  step_YeoJohnson(lead_time) %>%
+  step_lencode_mixed(agent, company, outcome = vars(avg_price_per_room)) %>%
+  step_dummy(all_nominal_predictors()) %>%
+  step_zv(all_predictors())
+
+hotel_effect_wflow <-
+  workflow() %>%
+  add_model(linear_reg()) %>% 
+  update_recipe(hotel_effect_rec)
+
+reg_metrics <- metric_set(mae, rsq)
+
+hotel_effect_res <-
+  hotel_effect_wflow %>%
+  fit_resamples(hotel_rs, metrics = reg_metrics)
+
+collect_metrics(hotel_effect_res)
+```
+
+**可视化**: 在这个过程中，你创建了几个直方图来可视化`agent_stats`数据，以及一个散点图来比较ADR的样本均值和通过效果编码估计的值。
+
+```{r}
+before <- hotel_train %>% 
+    select(avg_price_per_room, agent) %>% 
+    slice(1:7) %>% 
+    add_rowindex()
+before
+
+after <- left_join(before, estimates, by = "agent") %>% 
+  select(avg_price_per_room, agent = estimate, .row)
+after
+```
+
+```{r}
+agent_stats %>%   
+  ggplot(aes(x = num_reservations)) +
+  geom_histogram(bins = 30, col = "blue", fill = "blue", alpha = 1/3) +
+  labs(x = "Number of reservations per agent")
+
+agent_stats %>%   
+  ggplot(aes(x = ADR)) +
+  geom_histogram(bins = 30, col = "red", fill = "red", alpha = 1/3) +
+  labs(x = "Average ADR per agent")
+
+  
+agent_stats %>%   
+  ggplot(aes(x = num_reservations)) +
+  geom_histogram(bins = 30, col = "blue", fill = "blue", alpha = 1/3) +
+  labs(x = "Number of reservations per agent")
+
+agent_stats %>%   
+  ggplot(aes(x = ADR)) +
+  geom_histogram(bins = 30, col = "red", fill = "red", alpha = 1/3) +
+  labs(x = "Average ADR per agent")
+
+inner_join(agent_stats, estimates, by = "agent") %>% 
+  ggplot(aes(x = ADR, y = estimate)) + 
+  geom_abline(col = "green", lty = 2) +
+  geom_point(aes(size = num_reservations), alpha = 1/3) +
+  coord_obs_pred() +
+  scale_size(range = c(1/3, 5)) +
+  labs(x = "ADR Sample Mean", y = "Estimated via Effects Encoding")
+```
+
+这段代码是一个完整的机器学习工作流程的实例，包括数据预处理、特征工程、模型训练和评估等步骤。它展示了如何使用R和一些关键的数据科学包（如`tidymodels`和`embed`）来进行复杂的数据分析和建模任务。
+
+
+
+
+
