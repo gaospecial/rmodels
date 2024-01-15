@@ -4,7 +4,7 @@ project:
 book:
   title: "R Models"
   author: "gaoch"
-  date: "2023/12/30"
+  date: now
   chapters:
     - index.qmd
     - part: 10.tidymodels-intro.qmd
@@ -16,7 +16,7 @@ book:
     - part: 20.data-mining.qmd
       chapters: 
         - 21.house-price-pred-lm.qmd
-        - 22.insurance-predict.qmd
+#        - 22.insurance-prediction.qmd
     - part: 90.conclusion.qmd
   appendices: 
     - 95.references.qmd
@@ -40,13 +40,13 @@ format:
 
   pdf:
     documentclass: scrreprt
-    include-in-header: 
-      text: |
-        \usepackage{makeidx}
-        \makeindex
-    include-after-body: 
-      text: |
-        \printindex
+#    include-in-header: 
+#      text: |
+#        \usepackage{makeidx}
+#        \makeindex
+#    include-after-body: 
+#      text: |
+#        \printindex
   docx: default
 
 

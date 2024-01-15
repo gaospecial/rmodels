@@ -20,8 +20,8 @@ set.seed(202209)
 读入数据，生成R数据框。将 `price`、`sqft_living`、`sqft_lot`、`sqft_above` 这四个变量取对数；并计算到 2015 年时房屋的年龄。
 
 ```{r}
-house <- read.csv("./data-raw/ch6_house.csv",
-                  colClasses = rep("numeric", 10))
+file = xfun::magic_path("ch6_house.csv")
+house <- readr::read_csv(file)
 
 house <- house %>%
   mutate(log_price = log(price)) %>%
@@ -109,7 +109,6 @@ plot(fit2.lm, which=c(1:4))
 
 ```{r}
 prediction.lm <- predict(fit2.lm, house_testing)
-
 ```
 
 `predition.lm` 中含有预测的对数价格，`exp(pred.lm)` 将对数价格转换为预测的价格。将预测价格与真实价格取差值，平方之后平均，再开根号。计算出测试数据集的房屋价格预测的均方根误差。
