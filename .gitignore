@@ -1,2 +1,9 @@
 /.quarto/
 /_book/
+/book-output/
+*.aux
+*.log
+*.tex
+*.toc
+*_files
+.DS_Store
