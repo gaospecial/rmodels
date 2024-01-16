@@ -38,8 +38,9 @@ format:
     mermaid:
       theme: forest
 
-  pdf:
-    documentclass: scrreprt
+#  pdf:
+#    documentclass: book
+#    mainfont: "PingFang SC"
 #    include-in-header: 
 #      text: |
 #        \usepackage{makeidx}
