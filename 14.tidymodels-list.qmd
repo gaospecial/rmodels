@@ -1,0 +1,85 @@
+# 常见模型
+
+`tidymodels` 中包含了很多不同的模型（<https://www.tidymodels.org/find/parsnip/>）。
+
+仅就执行”回归“任务的模型而言，有下面这些。
+
+1. **Boosted ARIMA Regression Models**: 这种方法结合了自回归综合移动平均(ARIMA)和增强算法。主要用于时间序列预测。
+2. **ADAM Regression Models**: ADAM指的是自适应动态自回归移动平均模型，也主要用于时间序列预测。
+3. **ARIMA Regression Models**: ARIMA模型是一种常见的时间序列预测模型。
+4. **Automatic machine learning**: 自动机器学习(AutoML)是一种自动化选择最佳算法和参数的过程。
+5. **Bagged MARS**: Bagged MARS结合了多重自适应回归样条(MARS)和装袋(bagging)技术以提高预测精度。
+6. **Bagged neural networks**: 这种方法结合了神经网络和装袋算法以提升稳健性。
+7. **Bagged trees**: 袋装决策树是一种集成学习方法，提高模型准确性和防止过拟合。
+8. **Bayesian additive regression trees**: BART 是一种贝叶斯方法，可用于处理线性和非线性问题。
+9. **Boosted PROPHET Time Series Models**: 结合了 Facebook's Prophet 时间序列预测方法和 boosting 方法。
+10. **Boosted trees**: 提升树模型是一种预测模型，使用梯度提升构建强学习器。
+11. **Cubist rule-based regression models**: Cubist 是一种基于规则的回归模型，能够适应非线性关系。
+12. **Decision trees**: 决策树是一种基本的分类和回归方法。
+13. **Exponential Smoothing State Space Models**: 也被称为 ETS，主要用于时间序列分析。
+14. **Generalized additive models**: GAM 是一种灵活的线性回归方法，能处理非线性的关系。
+15. **K-nearest neighbors**: KNN 是一种基本的分类和回归方法。
+16. **Linear regression via keras/tensorflow/glmnet/glm**: 这些都是实现线性回归的工具或框架。
+17. **Linear support vector machines (SVMs)**: SVM 是一种类别预测工具，线性 SVM 主要用于二元分类问题。
+18. **Multilayer perceptron**: MLP 是一种前馈神经网络，多用于分类和回归分析。
+19. **Multiple Seasonality Regression Models**: 多季节性回归模型用于处理具有多季节性影响的时间序列数据。
+20. **Multivariate adaptive regression splines**: MARS 是一种灵活的回归方法，适用于高维数据集。
+21. **NAIVE Forecast Models**: NAIVE 模型是一种简单的时间序列预测方法，通常用作基线预测。
+22. **NNETAR Regression Models**: NNETAR 是一种神经网络自回归模型，主要用于时间序列预测。
+23. **Parametric survival regression**: 此方法用于生存分析中，当数据具有时间至事件特性时。
+24. **Poisson regression**: 泊松回归适用于因变量为计数数据的情况。
+
+此外，执行“分类”任务的模型有：
+
+
+1. **Automatic machine learning**: 自动机器学习（AutoML）是一种利用优化算法挑选出最佳算法和参数的过程。这大大降低了人工选择和调整模型的复杂度。
+
+2. **Bagged MARS**: 这是一种集成学习方法，它结合了多重自适应回归样条（MARS）和装袋（bagging）技术，以提高预测精度。
+
+3. **Bagged neural networks**: 这是一种集成神经网络的方法。通过创建多个神经网络并取其平均值，可以提升模型的稳定性，并减少过拟合的可能性。
+
+4. **Bagged trees**: 袋装决策树是一种集成学习策略，可以提高模型的泛化性能，并降低模型的方差。
+
+5. **Bayesian additive regression trees (BART)**: BART 是一种非参数贝叶斯方法，可以用于处理非线性和交互效应的问题。
+
+6. **Boosted trees**: 提升树是一种强大的机器学习算法，通过串行构建一系列的小型决策树，每一个新的树学习前面树的错误来进行改进。
+
+7. **C5.0 rule-based classification models**: C5.0 是一个决策树模型，以及一个规则集的生成器。它比它的前身C4.5 更快，需要更少的内存，并且有一个能提高预测精度的boosting选项。
+
+8. **Decision trees**: 决策树是一种监督学习方法，适用于分类和回归问题。
+
+9. **Flexible discriminant analysis (FDA)**: FDA 是一种分类技术，它扩展了线性判别分析（LDA），允许在预测分类时使用非线性函数。
+
+10. **Generalized additive models (GAM)**: GAM 是一种灵活的线性回归方法，能处理非线性和非参数关系。
+
+11. **K-nearest neighbors(KNN)**: KNN 是一种基于实例的学习或局部近似和所有计算在分类阶段完成的非泛化机器学习方法。
+
+12. **Linear discriminant analysis(LDA)**: LDA 是一种分类技术，它寻找最大化类间差异并最小化类内差异的特征投影方向。
+
+13. **Linear support vector machines (SVMs)**: 线性支持向量机是一种二元分类模型，其决策边界是数据的超平面。
+
+14. **Logistic regression**: 逻辑回归是一种解决二元分类问题的常见统计方法。
+
+15. **Multilayer perceptron(MLP)**: MLP 是一种前馈神经网络，它可以处理复杂的数据集，并在多种任务上表现良好。
+
+16. **Multinomial regression**: 多项式回归是一个用于多类分类的广义线性模型。
+
+17. **Multivariate adaptive regression splines (MARS)**: MARS 是一种灵活的非线性回归方法，适用于高维问题。
+
+18. **Naive Bayes models**: 朴素贝叶斯是一种基于应用贝叶斯定理与特征独立假设的简单概率分类器。
+
+19. **Null model**: 空模型是一个不包含任何预测变量的模型，通常用作比较的基准模型。
+
+20. **Partial least squares(PLS)**: PLS 是一种处理具有多重共线性数据的回归分析方法。
+
+21. **多项式支持向量机 (Polynomial SVMs)**： 这是一种基于支持向量机 (SVM) 的分类和回归方法。它通过在输入数据中引入高阶项来处理非线性问题。这使得算法可以在高维空间中找到数据的最优分隔超平面。
+
+22. **二次判别分析 (Quadratic Discriminant Analysis)**： 这是一种统计分类技术，它使用贝叶斯理论和二次判别分析来估计给定观察值属于哪个类别的概率。它不假设各类别的协方差矩阵相同，所以能够处理更复杂的情况。
+
+23. **径向基函数支持向量机 (Radial Basis Function SVMs)**： 它是一种使用径向基函数 (RBF) 作为核函数的支持向量机。RBF可以映射输入到无限维的特征空间，使得非线性问题变得线性可解。
+
+24. **随机森林 (Random forests)**： 这是一种基于决策树的集成学习算法。它通过生成和结合许多个决策树，减少过拟合的风险，并提高预测性能。
+
+25. **正则化判别分析 (Regularized Discriminant Analysis)**： 它是一种改进的判别分析方法，通过引入正则化参数来防止过拟合。这使得模型既能保持高度的复杂性，又能防止对训练数据的过度拟合。
+
+26. **RuleFit 模型**: 这是一个对数据生成可解释规则的机器学习模型。它结合了决策树和线性模型的优点，可以生成简单、直观且好理解的规则。

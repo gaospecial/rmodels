@@ -35,7 +35,25 @@ knitr::include_graphics("https://vnote-1251564393.cos.ap-chengdu.myqcloud.com/pi
 
 ## 什么是 tidymodels？
 
-`tidymodels` 是一个 R 语言的机器学习工具集合，包含了一系列用于统计建模和机器学习的软件包。以下是 `tidymodels` 主要组成部分及其功能的简要介绍 (@fig-tidymodels-homepage)：
+`tidymodels` 是一个 R 语言的机器学习工具集合，包含了一系列用于统计建模和机器学习的软件包。
+
+它是一个统一的建模框架，为 R 用户提供了一种进行预处理，建模，评估和调整的有序方法。其目标是简化数据分析过程。这个框架集成了很多现有且被广泛使用的R包，使得其具有良好的扩展性。
+
+Tidymodels包含以下几个主要的组件：
+
+- `Recipes`: 这是一种用于数据预处理步骤的样板文件/蓝图。例如，缩放或中心化连续变量，编码分类变量等。
+
+- `rsample`: 用于重复抽样，例如交叉验证或bootstrap。
+
+- `parnsip`: 用于设置模型规范和引擎。
+
+- `tune`: 用于模型调优。
+
+- `workflows`: 允许将预处理步骤（即配方）和模型规范合并为单一对象，以便在整个工作流程中保持一致性。
+
+- `yardstick`: 用于计算模型的表现和效果。
+
+以下是 `tidymodels` 主要组成部分及其功能的简要介绍 (@fig-tidymodels-homepage)：
 
 ![tidymodels 相关包](https://vnote-1251564393.cos.ap-chengdu.myqcloud.com/picgo/202312301134817.png){#fig-tidymodels-homepage}
 
@@ -169,3 +187,4 @@ library("tidymodels")
      ```
 
 这些包涵盖了不同类型回归任务的需求，从传统的线性回归到深度学习和贝叶斯回归。
+

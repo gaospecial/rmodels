@@ -12,6 +12,7 @@ book:
         - 11.tidymodels-basic.qmd
         - 12.tidymodels-advanced.qmd
         - 13.tidymodels-extra.qmd 
+        - 14.tidymodels-list.qmd
         - 30.tidymodels-example.qmd
     - part: 20.data-mining.qmd
       chapters: 
