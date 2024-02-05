@@ -371,7 +371,6 @@ You can use your fitted workflow for model and/or prediction explanations:
 先训练一个决策树模型，然后再评价该模型的性能。
 
 ```{r setup-previous}
-#| echo: false
 library(tidymodels)
 
 set.seed(123)
