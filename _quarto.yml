@@ -13,6 +13,7 @@ book:
         - 12.tidymodels-advanced.qmd
         - 13.tidymodels-extra.qmd 
         - 14.tidymodels-list.qmd
+        - 15.tidymodels-recipes.qmd
         - 30.tidymodels-example.qmd
     - part: 20.data-mining.qmd
       chapters: 

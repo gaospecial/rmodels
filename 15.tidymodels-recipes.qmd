@@ -1,0 +1,230 @@
+# 特征工程
+
+{{< include 01.ai-content-notice.qmd >}}
+
+## 什么是特征工程
+
+特征工程是一种**数据预处理**的方法，它可以帮助机器学习模型更好地理解和预测数据。特征工程的主要步骤有：
+
+- **特征理解**：分析数据的来源、类型、分布、缺失值、异常值等，了解数据的特点和含义。
+- **特征选择**：根据数据的相关性、重要性、冗余性等，选择对模型有用的特征，减少特征的维度和噪声。
+- **特征提取**：利用数学或统计方法，从原始数据中提取出新的特征，例如主成分分析（PCA）、线性判别分析（LDA）、奇异值分解（SVD）等。
+- **特征构造**：利用数据领域的知识，创造出新的特征，例如组合、分解、变换、编码等。
+- **特征转换**：将特征转换为适合模型的格式，例如标准化、归一化、离散化、独热编码等。
+
+特征工程是机器学习中的一门艺术，它需要不断地尝试和优化，才能找到最合适的特征组合。特征工程的好坏，往往决定了模型的性能和效果。
+
+在 `tidymodels` 中，使用 `recipes` 软件包进行特征工程，它可以让您用类似dplyr的管道语法来创建和预处理机器学习的特征。`recipes`软件包的主要优点有：
+
+- 它可以处理各种数据类型，包括数值、分类、文本、图像等。
+- 它可以方便地添加、删除、修改和组合特征工程的步骤，以及调整参数和选项。
+- 它可以自动估计特征工程的统计参数，并将其应用到新的数据集上，保证数据的一致性。
+- 它可以与其他`tidymodels`包，如`rsample`、`parsnip`、`tune`等无缝地集成，构建完整的机器学习流程。
+
+如果您想学习如何使用 `recipes` 软件包，您可以参考以下的资源：
+
+- [recipes官方网站](https://recipes.tidymodels.org/)：这里有`recipes`软件包的详细文档、教程和示例，以及常见问题的解答。
+- [Feature Engineering and Selection](https://bookdown.org/max/FES/)：这是一本在线书籍，介绍了特征工程的理论和应用，包括使用`recipes`软件包的示例。
+- [R Recipes: A Problem-Solution Approach](https://link.springer.com/book/10.1007/978-1-4842-0130-5)：这是一本实用的书籍，提供了使用R语言进行数据分析和机器学习的各种问题和解决方案，其中也涉及了`recipes`软件包的用法。
+
+## recipes 中的概念
+
+**来源**：<https://recipes.tidymodels.org/articles/recipes.html>
+
+首先说明几个定义如下：
+
+- **变量（Variables）**：原始数据集中的列，例如在传统公式 `Y ~ A + B + A:B` 中，变量包括 `A`、`B` 和 `Y`。
+- **角色（Roles）**：定义变量在模型中如何使用。例如：`predictor`（自变量）、`response`（因变量）和 `case weight`。这意味着角色的设定是开放且可扩展的。
+- **项（Terms）**：设计矩阵中的列，如 `A`、`B` 和 `A:B`。这些也可以是其他派生实体，例如一组主成分或一组定义变量基函数的列。这些与机器学习中的特征是同义词。被赋予 `predictor` 角色的变量将自动成为主效应项。
+
+总的来说，在 `recipes` 包中，你可以通过分配“角色”来指定每个变量的用途，并创建“项”以指定模型中的特征。这种方式提供了一个灵活的框架，使得数据预处理和特征工程变得更加简单和直观。
+
+## 最小实例
+
+这段代码首先从 "modeldata" 包中加载了一个名为 "ames" 的数据集，然后对 "Sale_Price" 列（房价）进行了对数转换。接着，它定义了一个预处理流程，包括一些特征工程步骤，这个流程将用于训练模型。
+
+:::{.callout-note}
+**关于 `ames` 数据集**
+
+Ames Housing 数据集来源于美国爱荷华州 Ames 市的住宅销售信息，由 Dean De Cock 教授收集而成，用于教学目的，特别是数据清洗和高级回归技术。
+
+这个数据集包含了 2006 年到 2010 年间 Ames 市近 3000 所房屋的 79 种特征，如房屋类型、建造年份、房间数量、地下室情况、车库大小、建筑材料等，以及每个房屋的最终销售价格。
+
+在这个数据集中，每一行代表一处房产，每一列代表一个特性，其中 `Sale_Price` 列是我们通常要预测的目标变量。这个数据集通常被用来进行回归分析或机器学习任务，例如预测未来的房价。
+
+因为这个数据集有许多特征，并且涉及到各种不同类型的变量（如类别变量、顺序变量和数值变量），所以它是一个非常好的数据集，可以用来练习和展示数据预处理、特征工程和模型调优等技巧。
+:::
+
+```{r}
+data(ames, package = "modeldata")
+
+ames <- mutate(ames, Sale_Price = log10(Sale_Price))
+
+ames_rec <-
+  recipe(Sale_Price ~ ., data = ames[-(1:6), ]) %>%
+  step_other(Neighborhood, threshold = 0.05) %>%
+  step_dummy(all_nominal()) %>%
+  step_interact(~ starts_with("Central_Air"):Year_Built) %>%
+  step_ns(Longitude, Latitude, deg_free = 2) %>%
+  step_zv(all_predictors())
+
+ames_rec = prep(ames_rec)
+
+# return the training set (already embedded in ames_rec)
+bake(ames_rec, new_data = NULL)
+
+# apply processing to other data:
+bake(ames_rec, new_data = head(ames))
+```
+
+
+以下是每个步骤的详细解释：
+
+- `recipe(Sale_Price ~ ., data = ames[-(1:6), ])`：这行创建了一个 "recipe" 对象，指定了因变量 (Sale_Price) 和自变量（数据框的所有其他列）。`ames[-(1:6), ]` 表示去掉了前 6 行的数据。
+
+- `step_other(Neighborhood, threshold = 0.05)`：该步骤将 "Neighborhood" 变量中那些少于 5% 的类别合并为一个新的类别 "other"。
+
+- `step_dummy(all_nominal())`：这步创建虚拟（哑）变量，对所有标称变量执行独热编码。
+
+- `step_interact(~ starts_with("Central_Air"):Year_Built)`：这步创建交互项，即 "Central_Air" 与 "Year_Built" 的乘积。
+
+- `step_ns(Longitude, Latitude, deg_free = 2)`：该步执行自然样条转换，通常用于处理非线性关系。
+
+- `step_zv(all_predictors())`：这步会删除所有零方差预测变量，即那些在所有观察值中都具有相同值的列。
+
+`prep(ames_rec)` 函数对这个 recipe 进行预处理，计算出需要的统计量（如均值、标准差等）。之后，可以使用 `bake()` 函数来应用这个预处理流程到新的数据上。例如，`bake(ames_rec, new_data = NULL)` 会将预处理流程应用到训练集（即创建 recipe 时用的数据），而 `bake(ames_rec, new_data = head(ames))` 则会将其应用到数据框 "ames" 的前几行。
+
+## 特征工程的方法
+
+`recipes` 软件包中有两大类函数，一类是用来进行变量选择的函数，与 `tidyselect` 中的用法大概相同，另一类是用来进行变量转换的函数，通常以 `step_*` 开头。
+
+**Selectors**
+
+
+- use basic variable names (e.g. `x1`, `x2`),
+- `dplyr` functions for selecting variables: `contains()`, `ends_with()`, `everything()`, `matches()`, `num_range()`, and `starts_with()`,
+- functions that subset on the role of the variables that have been specified so far: `all_outcomes()`, all_predictors(), has_role(),
+- similar functions for the type of data: all_nominal(), all_numeric(), and has_type(), or
+compound selectors such as all_nominal_predictors() or all_numeric_predictors().
+
+**Step**
+
+`recipes` 库提供了许多 `step_` 函数用于数据预处理和特征工程。以下是一些主要的类别：
+
+1. **缩放与中心化**：例如 `step_center()` 和 `step_scale()`。这两个函数可以将数值型变量重新缩放到均值为 0，标准差为 1。比如：
+
+```r
+recipe <- recipe(~ ., data = your_data) %>%
+  step_center(all_numeric()) %>%
+  step_scale(all_numeric())
+```
+
+2. **离散化**：例如 `step_discretize()`。这个函数可以将连续变量划分为若干个范围（即“桶”），然后转换为因子类型。
+
+```r
+recipe <- recipe(~ ., data = your_data) %>%
+  step_discretize(Age, options = list(cuts = 5))
+```
+
+3. **创建虚拟变量**：例如 `step_dummy()`。这个函数可以对分类变量进行独热编码，每个类别生成一个新的二进制特征。
+
+```r
+recipe <- recipe(~ ., data = your_data) %>%
+  step_dummy(Gender)
+```
+
+4. **交互项和多项式**：例如 `step_interact()` 和 `step_poly()`. `step_interact()` 可以创建交互项（即两个或更多变量的乘积），而 `step_poly()` 可以创建多项式特征。
+
+```r
+recipe <- recipe(~ ., data = your_data) %>%
+  step_interact(~ starts_with("x1"):starts_with("x2")) %>%
+  step_poly(Gender, degree = 2)
+```
+
+5. **缺失值处理**：例如 `step_impute_knn()` 和 `step_impute_median()`. 这些函数可以用不同的方法（如 KNN 填充或中位数填充）来处理缺失值。
+
+```r
+recipe <- recipe(~ ., data = your_data) %>%
+  step_impute_knn(all_predictors()) %>%
+  step_impute_median(Age)
+```
+
+此外，`recipes` 包中的 `filter` 类函数用于选择或排除特定的观察值或变量。例如：
+
+1. **step_slice()**：这个函数会根据给定的行索引保留或删除观察值。
+
+```r
+recipe <- recipe(~ ., data = your_data) %>%
+  step_slice(row_index(5:10))
+```
+上面的代码将保留第5行至第10行的数据。
+
+2. **step_rm()**：这个函数会从数据集中删除指定的变量。
+
+```r
+recipe <- recipe(~ ., data = your_data) %>%
+  step_rm(Gender)
+```
+上面的代码将从数据集中移除 `Gender` 这一列。
+
+3. **step_zv()**：该函数会删除所有零方差预测变量，即那些在所有观察值中都具有相同值的列。
+
+```r
+recipe <- recipe(~ ., data = your_data) %>%
+  step_zv(all_predictors())
+```
+上面的代码将移除所有零方差的预测变量。
+
+4. **step_corr()**：对于高度相关的预测变量（即两个变量相互之间的相关性超过给定阈值），此函数将只保留一个。
+
+```r
+recipe <- recipe(~ ., data = your_data) %>%
+  step_corr(all_numeric(), threshold = 0.9)
+```
+以上代码将移除与任何其他数值变量相关性超过 0.9 的变量。
+
+以上只是一部分例子，`recipes` 包还提供了更多的 `step_` 函数。具体可根据数据集和建模需求选择合适的预处理步骤。
+
+## 其它的特征工程工具
+
+除了 `recipes` 包，还有另外一些包提供了更多的特征工程工具。这些工具可以在 <https://www.tidymodels.org/find/recipes/> 找到。
+
+例如，`textrecipes` 是 `tidymodels` 的一个扩展包，专门处理自然语言处理（NLP）任务中常见的文本预处理和特征工程步骤。它遵循与 `recipes` 包相同的设计原理，并提供了一些针对文本数据的 `step_` 函数。
+
+以下是一些主要的 `step_` 函数：
+
+1. **step_tokenize()**： 这个函数将文本分割成单词或标记(token)。
+
+```r
+recipe <- recipe(~ ., data = your_data) %>%
+  step_tokenize(text_column)
+```
+
+2. **step_stopwords()**：这个函数可以删除被认为对模型没有信息价值的常用词（如“the”、“and”等）。
+
+```r
+recipe <- recipe(~ ., data = your_data) %>%
+  step_tokenize(text_column) %>%
+  step_stopwords(text_column)
+```
+
+3. **step_tfidf()**：此函数计算每个词的 TF-IDF （词频-逆文档频率）得分，这是一种常见的计算词重要性的方法。
+
+```r
+recipe <- recipe(~ ., data = your_data) %>%
+  step_tokenize(text_column) %>%
+  step_tfidf(text_column)
+```
+
+4. **step_sequence_onehot()**: 对序列数据进行独热编码。
+
+```r
+recipe <- recipe(~ ., data = your_data) %>%
+  step_sequence_onehot(text_column)
+```
+
+以上只是 `textrecipes` 包提供的部分函数，还有更多其他的函数用于处理特定的文本预处理任务，比如词干提取（stemming）、词形还原（lemmatization）等。这个包是对 `recipes` 包的有效扩展，使其能够更好地处理文本数据。
+
+除此之外，用户还可以创建自己的 `step_*` 函数，参见：<https://www.tidymodels.org/learn/develop/recipes/>。
+
+
