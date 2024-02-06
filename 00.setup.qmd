@@ -1,0 +1,39 @@
+## 配置默认环境
+
+```{r}
+#| label: setup
+#| include: false
+
+# 设置 knitr 选项
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>",
+    message = FALSE,
+    warning = FALSE
+)
+
+# 显示英文报错信息
+Sys.setenv(LANG = "en")
+
+# 使用 rmodels 环境
+reticulate::use_condaenv("rmodels",
+    conda = "/opt/homebrew/anaconda3/bin/conda"
+)
+
+# 导入 tidyverse 包
+library("tidyverse")
+
+# 导入 cailab.utils 包
+if (Sys.getenv("USER") == "gaoch") {
+    devtools::load_all("~/GitHub/cailab.utils")
+} else {
+    library("cailab.utils")
+}
+
+# 导入 tidymodels 包
+library(tidymodels)
+
+# 设置 ggplot 默认主题
+theme_set(theme_bw())
+```
+
