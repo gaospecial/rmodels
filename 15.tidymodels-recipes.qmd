@@ -228,3 +228,71 @@ recipe <- recipe(~ ., data = your_data) %>%
 除此之外，用户还可以创建自己的 `step_*` 函数，参见：<https://www.tidymodels.org/learn/develop/recipes/>。
 
 
+## 创建新变量
+
+这个代码示例主要展示了 `recipes` 包在数据预处理中的使用，包括创建新的变量以及如何正确地嵌入对象。让我们一步一步来看。
+
+
+```{r}
+rec <-
+  recipe(~., data = iris) %>%
+  step_mutate(
+    dbl_width = Sepal.Width * 2,
+    half_length = Sepal.Length / 2
+  )
+
+prepped <- prep(rec, training = iris %>% slice(1:75))
+
+library(dplyr)
+
+dplyr_train <-
+  iris %>%
+  as_tibble() %>%
+  slice(1:75) %>%
+  mutate(
+    dbl_width = Sepal.Width * 2,
+    half_length = Sepal.Length / 2
+  )
+
+rec_train <- bake(prepped, new_data = NULL)
+all.equal(dplyr_train, rec_train)
+
+dplyr_test <-
+  iris %>%
+  as_tibble() %>%
+  slice(76:150) %>%
+  mutate(
+    dbl_width = Sepal.Width * 2,
+    half_length = Sepal.Length / 2
+  )
+rec_test <- bake(prepped, iris %>% slice(76:150))
+all.equal(dplyr_test, rec_test)
+
+# Embedding objects:
+const <- 1.414
+
+qq_rec <-
+  recipe(~., data = iris) %>%
+  step_mutate(
+    bad_approach = Sepal.Width * const,
+    best_approach = Sepal.Width * !!const
+  ) %>%
+  prep(training = iris)
+
+bake(qq_rec, new_data = NULL, contains("appro")) %>% slice(1:4)
+
+# The difference:
+tidy(qq_rec, number = 1)
+
+```
+
+
+首先，定义了一个 `recipe`，该 `recipe` 对 `iris` 数据集的 `Sepal.Width` 和 `Sepal.Length` 列进行了变换，创建了两个新的列 `dbl_width`（等于 `Sepal.Width` 的两倍）和 `half_length`（等于 `Sepal.Length` 的一半）。然后，使用 `prep()` 函数准备（或训练）这个 `recipe`，得到了预处理步骤的结果。
+
+接着，使用 `dplyr` 手动对训练集和测试集进行了相同的预处理步骤，并使用 `all.equal()` 检查手动处理后的结果是否与使用 `recipes` 得到的结果一致。结果表明，两种方式得到的结果是一致的。
+
+然后，介绍了嵌入常数对象的正确方法。在这部分的 `recipe` 中，通过对变量 `Sepal.Width` 乘以一个常数 `const` 来生成新的变量。这里使用了 `!!` 符号来强制评估 `const`。这种做法被称为“非标准评估”（non-standard evaluation, NSE），是 `tidyverse` 软件包中经常用到的一种技巧。在这种情况下，如果不使用 `!!`，那么 `const` 会被当作一个字符串，而不是其对应的值。
+
+最后，使用 `tidy()` 函数查看了 `recipe` 中预处理步骤的详细情况。从输出中可以看到，在 `best_approach` 列的预处理中，常数 `const` 已经被替换为其实际值 `1.414`。
+
+总的来说，这个示例展示了如何使用 `recipes` 包进行数据预处理，以及在处理过程中如何正确地处理嵌入的对象。

@@ -1,11 +1,37 @@
 # Linear Model For House Price Predication
 
----
-author: "Jia-Qi He"
-date: "2022/9/11"
----
+这里演示构建一个回归模型预测房价的方法。
 
-## Load Library
+```{r}
+file = xfun::magic_path("ch6_house.csv")
+house_raw <- readr::read_csv(file)
+house_raw
+```
+
+`house_raw` 是著名的 "King County House Prices" 数据集。
+
+## 对数据集的说明
+
+这个数据集包含了美国华盛顿州金县（其中包括西雅图）的房屋销售价格以及相关房屋特性。
+
+以下是一些列的描述：
+
+- `price`: 房屋销售价格，这通常是我们要预测的目标变量。
+- `bedrooms`: 卧室数量。
+- `bathrooms`: 浴室数量。
+- `sqft_living`: 居住面积（平方英尺）。
+- `sqft_lot`: 地块大小（平方英尺）。
+- `floors`: 楼层数。
+- `condition`: 房屋状况，一般是按照某种等级划分的。
+- `grade`: 根据 King County 分级系统评出的房屋等级。
+
+这个数据集经常被用来进行回归分析或机器学习任务，例如预测房价。
+
+## 传统方法
+
+下面是由 "Jia-Qi He" 在 "2022/9/11" 创作的传统方法。
+
+### Load Library
 
 ```{r}
 ## 加载程序包,使用里面的管道函数
@@ -15,15 +41,12 @@ library(dplyr)
 set.seed(202209)
 ```
 
-## Data Processing
+### Data Processing
 
 读入数据，生成R数据框。将 `price`、`sqft_living`、`sqft_lot`、`sqft_above` 这四个变量取对数；并计算到 2015 年时房屋的年龄。
 
 ```{r}
-file = xfun::magic_path("ch6_house.csv")
-house <- readr::read_csv(file)
-
-house <- house %>%
+house <- house_raw %>%
   mutate(log_price = log(price)) %>%
   mutate(log_sqft_living = log(sqft_living)) %>%
   mutate(log_sqft_lot = log(sqft_lot)) %>%
@@ -39,7 +62,7 @@ house_learning <- house[id_learning,]
 house_testing <- house[-id_learning,]
 ```
 
-## Fitting
+### Fitting
 
 对学习数据集拟合线性模型。因变量是 `log_price`，`log_sqft_living` 等变量均为自变量。
 
@@ -76,7 +99,7 @@ resid <- residuals(fit.lm)
 str(resid)
 ```
 
-## 模型诊断
+### 模型诊断
 
 将绘图窗口分为 2*2 的矩阵。指定绘图区域离下边界、左边界、上边界和右边界的距离（单位为文本行数），方便画下所有诊断图。
 
@@ -90,7 +113,7 @@ library(ggplot2)
 plot(fit.lm, which=c(1:4))
 ```
 
-## Model Optimization
+### Model Optimization
 
 从 Cook 距离图中可以看出，序号为"15871"的观测是异常点。
 
@@ -118,3 +141,98 @@ rmse.lm <- sqrt(mean((exp(prediction.lm) - house_testing$price)^2))
 
 str(rmse.lm)
 ```
+
+## tidymodels 方法
+
+`tidymodels` 方法重现了上面的建模过程，只是逻辑性和扩展性更好。
+
+```{r}
+library(tidymodels)
+
+# 划分数据集
+set.seed(20240206)
+(house_split = initial_split(house_raw, strata = price))
+
+# 训练集和测试集
+(house_train = training(house_split))
+(house_test = testing(house_split))
+
+# 创建 recipe
+house_rec = recipe(price ~ ., data = house_train) |> 
+  step_log(price, starts_with("sqft_")) |> 
+  step_mutate(age = 2015 - yr_built) |> 
+  step_rm(yr_built)
+summary(house_rec)
+
+# 定义训练参数
+reg_metrics = metric_set(mae, rsq)
+
+# 初始化 workflow
+house_wflow = workflow() |> 
+  add_recipe(house_rec) |> 
+  add_model(linear_reg())
+
+# 交叉验证集
+(house_rs = vfold_cv(house_train, strata = price))
+
+# 拟合并评估模型
+ctrl <- control_resamples(save_pred = TRUE)
+house_res <-
+  house_wflow %>%
+  fit_resamples(house_rs, control = ctrl, metrics = reg_metrics)
+
+# 在测试集上预测并评估模型
+house_test_preds <- house_wflow %>%
+  last_fit(house_split) %>%
+  collect_predictions(new_data = house_test)
+
+house_test_results <- house_test_preds %>%
+  metrics(truth = price, estimate = .pred)
+
+house_test_results
+```
+
+上述代码主要完成了以下几个步骤：
+
+1. 使用 `initial_split()` 函数将数据集划分为训练集和测试集。`strata = price` 参数表示在划分数据时，会根据 `price` 列的值进行分层抽样，以确保训练集和测试集中的 `price` 分布相似。
+
+2. 创建了一个预处理 `recipe`，其中包括对 `price` 和所有以 "sqft_" 开头的列进行对数转换，以及计算房龄（2015年减去建造年份）。
+
+3. 定义了回归任务的评价指标：平均绝对误差（MAE）和决定系数（R²）。
+
+4. 初始化了一个工作流，其中包含上述的预处理 `recipe` 以及线性回归模型。
+
+5. 对训练数据进行分层交叉验证，创建了一系列的训练/验证集。
+
+6. 最后一步是利用交叉验证的结果来拟合工作流，并评估模型性能。
+
+7. `last_fit()` 将工作流拟合到完整的训练数据上，然后用拟合好的模型在测试集上做预测。最后，计算了测试集上的 MAE 和 R² 指标并打印出来。
+
+
+最后，数据可视化是数据科学工作中的重要一环。我们可以通过可视化来更好地理解模型的性能以及数据的特点。以下是两个常见的可视化任务：
+
+1. **观察预测值与真实值的关系**：我们可以绘制一个散点图，横坐标为预测值，纵坐标为真实值。
+
+```{r}
+ggplot(house_test_preds, aes(x = .pred, y = price)) +
+  geom_point(alpha = 0.4) +
+  geom_abline(color = "blue") +
+  xlab("Predicted Price") +
+  ylab("True Price")
+```
+
+在这个图中，蓝色的线表示预测值和真实值完全相等的情况。如果模型的预测效果良好，那么点应该紧密地围绕在这条线周围。
+
+2. **查看每次交叉验证的结果**：我们可以绘制一个箱型图，展示每次交叉验证结果的分布。
+
+```r
+house_res %>%
+  collect_metrics() %>%
+  ggplot(aes(x = id, y = mean)) +
+  geom_boxplot() +
+  facet_wrap(~ .metric, scales = "free")
+```
+
+在这个图中，每个箱型图代表一次交叉验证的结果（即模型在不同训练/验证集上的表现）。通过查看箱型图，我们可以了解模型性能的稳定性和可靠性。
+
+以上只是一些基本的可视化示例，具体可视化的内容和方式会依据你对数据和任务的理解进行调整。
