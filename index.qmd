@@ -73,4 +73,5 @@ $$
 
 - **tidymodels** 软件包的使用 <https://workshops.tidymodels.org>
 - 《数据挖掘实战》读书笔记 [@ZhangShuJuWaJueJiYuRYuYanDeShiZhan2021]
+- 更多学习材料[@TidymodelsHuanYing, @silgeTidyModeling2022, @silgeSupervisedMachineLearning2023, @robinsonWelcomeTextMining2023, @mcconvilleStatisticalInferenceData2022]
 
