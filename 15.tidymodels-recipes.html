@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>R Models - 5&nbsp; 特征工程</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./30.tidymodels-example.html" rel="next">
+<link href="./14.tidymodels-list.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./10.tidymodels-intro.html">Machine Learning with Tidymodels</a></li><li class="breadcrumb-item"><a href="./15.tidymodels-recipes.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">特征工程</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">R Models</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./10.tidymodels-intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Machine Learning with Tidymodels</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11.tidymodels-basic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Basic tidymodels</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./12.tidymodels-advanced.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Advanced tidymodels</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./13.tidymodels-extra.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Extra tidymodels</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./14.tidymodels-list.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">常见模型和软件包</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./15.tidymodels-recipes.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">特征工程</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./30.tidymodels-example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Example of tidymodels</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./20.data-mining.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data mining with R</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./21.house-price-pred-lm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Linear Model For House Price Predication</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Summary</span></span>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./95.references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#配置默认环境" id="toc-配置默认环境" class="nav-link active" data-scroll-target="#配置默认环境"><span class="header-section-number">5.1</span> 配置默认环境</a></li>
+  <li><a href="#什么是特征工程" id="toc-什么是特征工程" class="nav-link" data-scroll-target="#什么是特征工程"><span class="header-section-number">5.2</span> 什么是特征工程</a></li>
+  <li><a href="#recipes-中的概念" id="toc-recipes-中的概念" class="nav-link" data-scroll-target="#recipes-中的概念"><span class="header-section-number">5.3</span> recipes 中的概念</a></li>
+  <li><a href="#最小实例" id="toc-最小实例" class="nav-link" data-scroll-target="#最小实例"><span class="header-section-number">5.4</span> 最小实例</a></li>
+  <li><a href="#特征工程的方法" id="toc-特征工程的方法" class="nav-link" data-scroll-target="#特征工程的方法"><span class="header-section-number">5.5</span> 特征工程的方法</a></li>
+  <li><a href="#其它的特征工程工具" id="toc-其它的特征工程工具" class="nav-link" data-scroll-target="#其它的特征工程工具"><span class="header-section-number">5.6</span> 其它的特征工程工具</a></li>
+  <li><a href="#创建新变量" id="toc-创建新变量" class="nav-link" data-scroll-target="#创建新变量"><span class="header-section-number">5.7</span> 创建新变量</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">特征工程</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Created with AI
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>该部分内容由 ChatGPT 等生成式 AI 工具参与创作，可能存在的问题如下：</p>
+<ul>
+<li>其中的说法可能并不准确，包括张冠李戴、时效性等方面可能存在问题。</li>
+<li>其中的一些代码虽然已经经过调试，可以正常运行，但是可能并不符合现下的编程规范或者推荐用法。</li>
+</ul>
+<p>尽管如此，这些内容还是具有较大的参考意义的。</p>
+<p>使用过程中请自行甄别。</p>
+<p>欢迎提出修改完善的建议。</p>
+</div>
+</div>
+<section id="配置默认环境" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="配置默认环境"><span class="header-section-number">5.1</span> 配置默认环境</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 设置 knitr 选项</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">collapse =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">comment =</span> <span class="st">"#&gt;"</span>,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">message =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">warning =</span> <span class="cn">FALSE</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 显示英文报错信息</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">LANG =</span> <span class="st">"en"</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 使用 rmodels 环境</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">use_condaenv</span>(<span class="st">"rmodels"</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">conda =</span> <span class="st">"/opt/homebrew/anaconda3/bin/conda"</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 导入 tidyverse 包</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(<span class="st">"tidyverse"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.4.4     ✔ tibble    3.2.1
+✔ lubridate 1.9.3     ✔ tidyr     1.3.0
+✔ purrr     1.0.2     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 导入 cailab.utils 包</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">Sys.getenv</span>(<span class="st">"USER"</span>) <span class="sc">==</span> <span class="st">"gaoch"</span>) {</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    devtools<span class="sc">::</span><span class="fu">load_all</span>(<span class="st">"~/GitHub/cailab.utils"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">library</span>(<span class="st">"cailab.utils"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ℹ Loading cailab.utils
+Registered S3 methods overwritten by 'treeio':
+  method              from    
+  MRCA.phylo          tidytree
+  MRCA.treedata       tidytree
+  Nnode.treedata      tidytree
+  Ntip.treedata       tidytree
+  ancestor.phylo      tidytree
+  ancestor.treedata   tidytree
+  child.phylo         tidytree
+  child.treedata      tidytree
+  full_join.phylo     tidytree
+  full_join.treedata  tidytree
+  groupClade.phylo    tidytree
+  groupClade.treedata tidytree
+  groupOTU.phylo      tidytree
+  groupOTU.treedata   tidytree
+  inner_join.phylo    tidytree
+  inner_join.treedata tidytree
+  is.rooted.treedata  tidytree
+  nodeid.phylo        tidytree
+  nodeid.treedata     tidytree
+  nodelab.phylo       tidytree
+  nodelab.treedata    tidytree
+  offspring.phylo     tidytree
+  offspring.treedata  tidytree
+  parent.phylo        tidytree
+  parent.treedata     tidytree
+  root.treedata       tidytree
+  rootnode.phylo      tidytree
+  sibling.phylo       tidytree</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 导入 tidymodels 包</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Registered S3 method overwritten by 'parsnip':
+  method          from 
+  print.nullmodel vegan
+── Attaching packages ────────────────────────────────────── tidymodels 1.1.1 ──
+✔ broom        1.0.5     ✔ rsample      1.2.0
+✔ dials        1.2.0     ✔ tune         1.1.2
+✔ infer        1.0.5     ✔ workflows    1.1.3
+✔ modeldata    1.2.0     ✔ workflowsets 1.0.1
+✔ parsnip      1.1.1     ✔ yardstick    1.2.0
+✔ recipes      1.0.9     
+── Conflicts ───────────────────────────────────────── tidymodels_conflicts() ──
+✖ scales::discard() masks purrr::discard()
+✖ dplyr::filter()   masks stats::filter()
+✖ recipes::fixed()  masks stringr::fixed()
+✖ dplyr::lag()      masks stats::lag()
+✖ yardstick::spec() masks readr::spec()
+✖ recipes::step()   masks stats::step()
+• Dig deeper into tidy modeling with R at https://www.tmwr.org</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 设置 ggplot 默认主题</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_bw</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="什么是特征工程" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="什么是特征工程"><span class="header-section-number">5.2</span> 什么是特征工程</h2>
+<p>特征工程是一种<strong>数据预处理</strong>的方法，它可以帮助机器学习模型更好地理解和预测数据。特征工程的主要步骤有：</p>
+<ul>
+<li><strong>特征理解</strong>：分析数据的来源、类型、分布、缺失值、异常值等，了解数据的特点和含义。</li>
+<li><strong>特征选择</strong>：根据数据的相关性、重要性、冗余性等，选择对模型有用的特征，减少特征的维度和噪声。</li>
+<li><strong>特征提取</strong>：利用数学或统计方法，从原始数据中提取出新的特征，例如主成分分析（PCA）、线性判别分析（LDA）、奇异值分解（SVD）等。</li>
+<li><strong>特征构造</strong>：利用数据领域的知识，创造出新的特征，例如组合、分解、变换、编码等。</li>
+<li><strong>特征转换</strong>：将特征转换为适合模型的格式，例如标准化、归一化、离散化、独热编码等。</li>
+</ul>
+<p>特征工程是机器学习中的一门艺术，它需要不断地尝试和优化，才能找到最合适的特征组合。特征工程的好坏，往往决定了模型的性能和效果。</p>
+<p>在 <code>tidymodels</code> 中，使用 <code>recipes</code> 软件包进行特征工程，它可以让您用类似dplyr的管道语法来创建和预处理机器学习的特征。<code>recipes</code>软件包的主要优点有：</p>
+<ul>
+<li>它可以处理各种数据类型，包括数值、分类、文本、图像等。</li>
+<li>它可以方便地添加、删除、修改和组合特征工程的步骤，以及调整参数和选项。</li>
+<li>它可以自动估计特征工程的统计参数，并将其应用到新的数据集上，保证数据的一致性。</li>
+<li>它可以与其他<code>tidymodels</code>包，如<code>rsample</code>、<code>parsnip</code>、<code>tune</code>等无缝地集成，构建完整的机器学习流程。</li>
+</ul>
+<p>如果您想学习如何使用 <code>recipes</code> 软件包，您可以参考以下的资源：</p>
+<ul>
+<li><a href="https://recipes.tidymodels.org/">recipes官方网站</a>：这里有<code>recipes</code>软件包的详细文档、教程和示例，以及常见问题的解答。</li>
+<li><a href="https://bookdown.org/max/FES/">Feature Engineering and Selection</a>：这是一本在线书籍，介绍了特征工程的理论和应用，包括使用<code>recipes</code>软件包的示例。</li>
+<li><a href="https://link.springer.com/book/10.1007/978-1-4842-0130-5">R Recipes: A Problem-Solution Approach</a>：这是一本实用的书籍，提供了使用R语言进行数据分析和机器学习的各种问题和解决方案，其中也涉及了<code>recipes</code>软件包的用法。</li>
+</ul>
+</section>
+<section id="recipes-中的概念" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="recipes-中的概念"><span class="header-section-number">5.3</span> recipes 中的概念</h2>
+<p><strong>来源</strong>：<a href="https://recipes.tidymodels.org/articles/recipes.html" class="uri">https://recipes.tidymodels.org/articles/recipes.html</a></p>
+<p>首先说明几个定义如下：</p>
+<ul>
+<li><strong>变量（Variables）</strong>：原始数据集中的列，例如在传统公式 <code>Y ~ A + B + A:B</code> 中，变量包括 <code>A</code>、<code>B</code> 和 <code>Y</code>。</li>
+<li><strong>角色（Roles）</strong>：定义变量在模型中如何使用。例如：<code>predictor</code>（自变量）、<code>response</code>（因变量）和 <code>case weight</code>。这意味着角色的设定是开放且可扩展的。</li>
+<li><strong>项（Terms）</strong>：设计矩阵中的列，如 <code>A</code>、<code>B</code> 和 <code>A:B</code>。这些也可以是其他派生实体，例如一组主成分或一组定义变量基函数的列。这些与机器学习中的特征是同义词。被赋予 <code>predictor</code> 角色的变量将自动成为主效应项。</li>
+</ul>
+<p>总的来说，在 <code>recipes</code> 包中，你可以通过分配“角色”来指定每个变量的用途，并创建“项”以指定模型中的特征。这种方式提供了一个灵活的框架，使得数据预处理和特征工程变得更加简单和直观。</p>
+</section>
+<section id="最小实例" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="最小实例"><span class="header-section-number">5.4</span> 最小实例</h2>
+<p>这段代码首先从 “modeldata” 包中加载了一个名为 “ames” 的数据集，然后对 “Sale_Price” 列（房价）进行了对数转换。接着，它定义了一个预处理流程，包括一些特征工程步骤，这个流程将用于训练模型。</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>关于 <code>ames</code> 数据集</strong></p>
+<p>Ames Housing 数据集来源于美国爱荷华州 Ames 市的住宅销售信息，由 Dean De Cock 教授收集而成，用于教学目的，特别是数据清洗和高级回归技术。</p>
+<p>这个数据集包含了 2006 年到 2010 年间 Ames 市近 3000 所房屋的 79 种特征，如房屋类型、建造年份、房间数量、地下室情况、车库大小、建筑材料等，以及每个房屋的最终销售价格。</p>
+<p>在这个数据集中，每一行代表一处房产，每一列代表一个特性，其中 <code>Sale_Price</code> 列是我们通常要预测的目标变量。这个数据集通常被用来进行回归分析或机器学习任务，例如预测未来的房价。</p>
+<p>因为这个数据集有许多特征，并且涉及到各种不同类型的变量（如类别变量、顺序变量和数值变量），所以它是一个非常好的数据集，可以用来练习和展示数据预处理、特征工程和模型调优等技巧。</p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(ames, <span class="at">package =</span> <span class="st">"modeldata"</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>ames <span class="ot">&lt;-</span> <span class="fu">mutate</span>(ames, <span class="at">Sale_Price =</span> <span class="fu">log10</span>(Sale_Price))</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>ames_rec <span class="ot">&lt;-</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(Sale_Price <span class="sc">~</span> ., <span class="at">data =</span> ames[<span class="sc">-</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>), ]) <span class="sc">%&gt;%</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_other</span>(Neighborhood, <span class="at">threshold =</span> <span class="fl">0.05</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_interact</span>(<span class="sc">~</span> <span class="fu">starts_with</span>(<span class="st">"Central_Air"</span>)<span class="sc">:</span>Year_Built) <span class="sc">%&gt;%</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_ns</span>(Longitude, Latitude, <span class="at">deg_free =</span> <span class="dv">2</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>())</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>ames_rec <span class="ot">=</span> <span class="fu">prep</span>(ames_rec)</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co"># return the training set (already embedded in ames_rec)</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="fu">bake</span>(ames_rec, <span class="at">new_data =</span> <span class="cn">NULL</span>)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 2,924 × 259</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    Lot_Frontage Lot_Area Year_Built Year_Remod_Add Mas_Vnr_Area BsmtFin_SF_1</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;           &lt;dbl&gt;    &lt;int&gt;      &lt;int&gt;          &lt;int&gt;        &lt;dbl&gt;        &lt;dbl&gt;</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  1           41     4920       2001           2001            0            3</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  2           43     5005       1992           1992            0            1</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  3           39     5389       1995           1996            0            3</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  4           60     7500       1999           1999            0            7</span></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  5           75    10000       1993           1994            0            7</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  6            0     7980       1992           2007            0            1</span></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  7           63     8402       1998           1998            0            7</span></span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  8           85    10176       1990           1990            0            3</span></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  9            0     6820       1985           1985            0            3</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10           47    53504       2003           2003          603            1</span></span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ℹ 2,914 more rows</span></span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ℹ 253 more variables: BsmtFin_SF_2 &lt;dbl&gt;, Bsmt_Unf_SF &lt;dbl&gt;,</span></span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   Total_Bsmt_SF &lt;dbl&gt;, First_Flr_SF &lt;int&gt;, Second_Flr_SF &lt;int&gt;,</span></span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   Gr_Liv_Area &lt;int&gt;, Bsmt_Full_Bath &lt;dbl&gt;, Bsmt_Half_Bath &lt;dbl&gt;,</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   Full_Bath &lt;int&gt;, Half_Bath &lt;int&gt;, Bedroom_AbvGr &lt;int&gt;, Kitchen_AbvGr &lt;int&gt;,</span></span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   TotRms_AbvGrd &lt;int&gt;, Fireplaces &lt;int&gt;, Garage_Cars &lt;dbl&gt;,</span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   Garage_Area &lt;dbl&gt;, Wood_Deck_SF &lt;int&gt;, Open_Porch_SF &lt;int&gt;, …</span></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="co"># apply processing to other data:</span></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="fu">bake</span>(ames_rec, <span class="at">new_data =</span> <span class="fu">head</span>(ames))</span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 6 × 259</span></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   Lot_Frontage Lot_Area Year_Built Year_Remod_Add Mas_Vnr_Area BsmtFin_SF_1</span></span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          &lt;dbl&gt;    &lt;int&gt;      &lt;int&gt;          &lt;int&gt;        &lt;dbl&gt;        &lt;dbl&gt;</span></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1          141    31770       1960           1960          112            2</span></span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2           80    11622       1961           1961            0            6</span></span>
+<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3           81    14267       1958           1958          108            1</span></span>
+<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4           93    11160       1968           1968            0            1</span></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5           74    13830       1997           1998            0            3</span></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6           78     9978       1998           1998           20            3</span></span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ℹ 253 more variables: BsmtFin_SF_2 &lt;dbl&gt;, Bsmt_Unf_SF &lt;dbl&gt;,</span></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   Total_Bsmt_SF &lt;dbl&gt;, First_Flr_SF &lt;int&gt;, Second_Flr_SF &lt;int&gt;,</span></span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   Gr_Liv_Area &lt;int&gt;, Bsmt_Full_Bath &lt;dbl&gt;, Bsmt_Half_Bath &lt;dbl&gt;,</span></span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   Full_Bath &lt;int&gt;, Half_Bath &lt;int&gt;, Bedroom_AbvGr &lt;int&gt;, Kitchen_AbvGr &lt;int&gt;,</span></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   TotRms_AbvGrd &lt;int&gt;, Fireplaces &lt;int&gt;, Garage_Cars &lt;dbl&gt;,</span></span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   Garage_Area &lt;dbl&gt;, Wood_Deck_SF &lt;int&gt;, Open_Porch_SF &lt;int&gt;,</span></span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   Enclosed_Porch &lt;int&gt;, Three_season_porch &lt;int&gt;, Screen_Porch &lt;int&gt;, …</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>以下是每个步骤的详细解释：</p>
+<ul>
+<li><p><code>recipe(Sale_Price ~ ., data = ames[-(1:6), ])</code>：这行创建了一个 “recipe” 对象，指定了因变量 (Sale_Price) 和自变量（数据框的所有其他列）。<code>ames[-(1:6), ]</code> 表示去掉了前 6 行的数据。</p></li>
+<li><p><code>step_other(Neighborhood, threshold = 0.05)</code>：该步骤将 “Neighborhood” 变量中那些少于 5% 的类别合并为一个新的类别 “other”。</p></li>
+<li><p><code>step_dummy(all_nominal())</code>：这步创建虚拟（哑）变量，对所有标称变量执行独热编码。</p></li>
+<li><p><code>step_interact(~ starts_with("Central_Air"):Year_Built)</code>：这步创建交互项，即 “Central_Air” 与 “Year_Built” 的乘积。</p></li>
+<li><p><code>step_ns(Longitude, Latitude, deg_free = 2)</code>：该步执行自然样条转换，通常用于处理非线性关系。</p></li>
+<li><p><code>step_zv(all_predictors())</code>：这步会删除所有零方差预测变量，即那些在所有观察值中都具有相同值的列。</p></li>
+</ul>
+<p><code>prep(ames_rec)</code> 函数对这个 recipe 进行预处理，计算出需要的统计量（如均值、标准差等）。之后，可以使用 <code>bake()</code> 函数来应用这个预处理流程到新的数据上。例如，<code>bake(ames_rec, new_data = NULL)</code> 会将预处理流程应用到训练集（即创建 recipe 时用的数据），而 <code>bake(ames_rec, new_data = head(ames))</code> 则会将其应用到数据框 “ames” 的前几行。</p>
+</section>
+<section id="特征工程的方法" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="特征工程的方法"><span class="header-section-number">5.5</span> 特征工程的方法</h2>
+<p><code>recipes</code> 软件包中有两大类函数，一类是用来进行变量选择的函数，与 <code>tidyselect</code> 中的用法大概相同，另一类是用来进行变量转换的函数，通常以 <code>step_*</code> 开头。</p>
+<p><strong>Selectors</strong></p>
+<ul>
+<li>use basic variable names (e.g.&nbsp;<code>x1</code>, <code>x2</code>),</li>
+<li><code>dplyr</code> functions for selecting variables: <code>contains()</code>, <code>ends_with()</code>, <code>everything()</code>, <code>matches()</code>, <code>num_range()</code>, and <code>starts_with()</code>,</li>
+<li>functions that subset on the role of the variables that have been specified so far: <code>all_outcomes()</code>, all_predictors(), has_role(),</li>
+<li>similar functions for the type of data: all_nominal(), all_numeric(), and has_type(), or compound selectors such as all_nominal_predictors() or all_numeric_predictors().</li>
+</ul>
+<p><strong>Step</strong></p>
+<p><code>recipes</code> 库提供了许多 <code>step_</code> 函数用于数据预处理和特征工程。以下是一些主要的类别：</p>
+<ol type="1">
+<li><strong>缩放与中心化</strong>：例如 <code>step_center()</code> 和 <code>step_scale()</code>。这两个函数可以将数值型变量重新缩放到均值为 0，标准差为 1。比如：</li>
+</ol>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> ., <span class="at">data =</span> your_data) <span class="sc">%&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_center</span>(<span class="fu">all_numeric</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_scale</span>(<span class="fu">all_numeric</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="2" type="1">
+<li><strong>离散化</strong>：例如 <code>step_discretize()</code>。这个函数可以将连续变量划分为若干个范围（即“桶”），然后转换为因子类型。</li>
+</ol>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> ., <span class="at">data =</span> your_data) <span class="sc">%&gt;%</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_discretize</span>(Age, <span class="at">options =</span> <span class="fu">list</span>(<span class="at">cuts =</span> <span class="dv">5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="3" type="1">
+<li><strong>创建虚拟变量</strong>：例如 <code>step_dummy()</code>。这个函数可以对分类变量进行独热编码，每个类别生成一个新的二进制特征。</li>
+</ol>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> ., <span class="at">data =</span> your_data) <span class="sc">%&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(Gender)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="4" type="1">
+<li><strong>交互项和多项式</strong>：例如 <code>step_interact()</code> 和 <code>step_poly()</code>. <code>step_interact()</code> 可以创建交互项（即两个或更多变量的乘积），而 <code>step_poly()</code> 可以创建多项式特征。</li>
+</ol>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> ., <span class="at">data =</span> your_data) <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_interact</span>(<span class="sc">~</span> <span class="fu">starts_with</span>(<span class="st">"x1"</span>)<span class="sc">:</span><span class="fu">starts_with</span>(<span class="st">"x2"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_poly</span>(Gender, <span class="at">degree =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="5" type="1">
+<li><strong>缺失值处理</strong>：例如 <code>step_impute_knn()</code> 和 <code>step_impute_median()</code>. 这些函数可以用不同的方法（如 KNN 填充或中位数填充）来处理缺失值。</li>
+</ol>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> ., <span class="at">data =</span> your_data) <span class="sc">%&gt;%</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_impute_knn</span>(<span class="fu">all_predictors</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_impute_median</span>(Age)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>此外，<code>recipes</code> 包中的 <code>filter</code> 类函数用于选择或排除特定的观察值或变量。例如：</p>
+<ol type="1">
+<li><strong>step_slice()</strong>：这个函数会根据给定的行索引保留或删除观察值。</li>
+</ol>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> ., <span class="at">data =</span> your_data) <span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_slice</span>(<span class="fu">row_index</span>(<span class="dv">5</span><span class="sc">:</span><span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>上面的代码将保留第5行至第10行的数据。</p>
+<ol start="2" type="1">
+<li><strong>step_rm()</strong>：这个函数会从数据集中删除指定的变量。</li>
+</ol>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> ., <span class="at">data =</span> your_data) <span class="sc">%&gt;%</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_rm</span>(Gender)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>上面的代码将从数据集中移除 <code>Gender</code> 这一列。</p>
+<ol start="3" type="1">
+<li><strong>step_zv()</strong>：该函数会删除所有零方差预测变量，即那些在所有观察值中都具有相同值的列。</li>
+</ol>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> ., <span class="at">data =</span> your_data) <span class="sc">%&gt;%</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>上面的代码将移除所有零方差的预测变量。</p>
+<ol start="4" type="1">
+<li><strong>step_corr()</strong>：对于高度相关的预测变量（即两个变量相互之间的相关性超过给定阈值），此函数将只保留一个。</li>
+</ol>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> ., <span class="at">data =</span> your_data) <span class="sc">%&gt;%</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_corr</span>(<span class="fu">all_numeric</span>(), <span class="at">threshold =</span> <span class="fl">0.9</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>以上代码将移除与任何其他数值变量相关性超过 0.9 的变量。</p>
+<p>以上只是一部分例子，<code>recipes</code> 包还提供了更多的 <code>step_</code> 函数。具体可根据数据集和建模需求选择合适的预处理步骤。</p>
+</section>
+<section id="其它的特征工程工具" class="level2" data-number="5.6">
+<h2 data-number="5.6" class="anchored" data-anchor-id="其它的特征工程工具"><span class="header-section-number">5.6</span> 其它的特征工程工具</h2>
+<p>除了 <code>recipes</code> 包，还有另外一些包提供了更多的特征工程工具。这些工具可以在 <a href="https://www.tidymodels.org/find/recipes/" class="uri">https://www.tidymodels.org/find/recipes/</a> 找到。</p>
+<p>例如，<code>textrecipes</code> 是 <code>tidymodels</code> 的一个扩展包，专门处理自然语言处理（NLP）任务中常见的文本预处理和特征工程步骤。它遵循与 <code>recipes</code> 包相同的设计原理，并提供了一些针对文本数据的 <code>step_</code> 函数。</p>
+<p>以下是一些主要的 <code>step_</code> 函数：</p>
+<ol type="1">
+<li><strong>step_tokenize()</strong>： 这个函数将文本分割成单词或标记(token)。</li>
+</ol>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> ., <span class="at">data =</span> your_data) <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(text_column)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="2" type="1">
+<li><strong>step_stopwords()</strong>：这个函数可以删除被认为对模型没有信息价值的常用词（如“the”、“and”等）。</li>
+</ol>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> ., <span class="at">data =</span> your_data) <span class="sc">%&gt;%</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(text_column) <span class="sc">%&gt;%</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_stopwords</span>(text_column)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="3" type="1">
+<li><strong>step_tfidf()</strong>：此函数计算每个词的 TF-IDF （词频-逆文档频率）得分，这是一种常见的计算词重要性的方法。</li>
+</ol>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> ., <span class="at">data =</span> your_data) <span class="sc">%&gt;%</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tokenize</span>(text_column) <span class="sc">%&gt;%</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_tfidf</span>(text_column)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="4" type="1">
+<li><strong>step_sequence_onehot()</strong>: 对序列数据进行独热编码。</li>
+</ol>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>recipe <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> ., <span class="at">data =</span> your_data) <span class="sc">%&gt;%</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_sequence_onehot</span>(text_column)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>以上只是 <code>textrecipes</code> 包提供的部分函数，还有更多其他的函数用于处理特定的文本预处理任务，比如词干提取（stemming）、词形还原（lemmatization）等。这个包是对 <code>recipes</code> 包的有效扩展，使其能够更好地处理文本数据。</p>
+<p>除此之外，用户还可以创建自己的 <code>step_*</code> 函数，参见：<a href="https://www.tidymodels.org/learn/develop/recipes/" class="uri">https://www.tidymodels.org/learn/develop/recipes/</a>。</p>
+</section>
+<section id="创建新变量" class="level2" data-number="5.7">
+<h2 data-number="5.7" class="anchored" data-anchor-id="创建新变量"><span class="header-section-number">5.7</span> 创建新变量</h2>
+<p>这个代码示例主要展示了 <code>recipes</code> 包在数据预处理中的使用，包括创建新的变量以及如何正确地嵌入对象。让我们一步一步来看。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>rec <span class="ot">&lt;-</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(<span class="sc">~</span>., <span class="at">data =</span> iris) <span class="sc">%&gt;%</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_mutate</span>(</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">dbl_width =</span> Sepal.Width <span class="sc">*</span> <span class="dv">2</span>,</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">half_length =</span> Sepal.Length <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>prepped <span class="ot">&lt;-</span> <span class="fu">prep</span>(rec, <span class="at">training =</span> iris <span class="sc">%&gt;%</span> <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">75</span>))</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>dplyr_train <span class="ot">&lt;-</span></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>  iris <span class="sc">%&gt;%</span></span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">75</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">dbl_width =</span> Sepal.Width <span class="sc">*</span> <span class="dv">2</span>,</span>
+<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">half_length =</span> Sepal.Length <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>rec_train <span class="ot">&lt;-</span> <span class="fu">bake</span>(prepped, <span class="at">new_data =</span> <span class="cn">NULL</span>)</span>
+<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(dplyr_train, rec_train)</span>
+<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>dplyr_test <span class="ot">&lt;-</span></span>
+<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>  iris <span class="sc">%&gt;%</span></span>
+<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">76</span><span class="sc">:</span><span class="dv">150</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">dbl_width =</span> Sepal.Width <span class="sc">*</span> <span class="dv">2</span>,</span>
+<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">half_length =</span> Sepal.Length <span class="sc">/</span> <span class="dv">2</span></span>
+<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>rec_test <span class="ot">&lt;-</span> <span class="fu">bake</span>(prepped, iris <span class="sc">%&gt;%</span> <span class="fu">slice</span>(<span class="dv">76</span><span class="sc">:</span><span class="dv">150</span>))</span>
+<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(dplyr_test, rec_test)</span>
+<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Embedding objects:</span></span>
+<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a>const <span class="ot">&lt;-</span> <span class="fl">1.414</span></span>
+<span id="cb22-39"><a href="#cb22-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-40"><a href="#cb22-40" aria-hidden="true" tabindex="-1"></a>qq_rec <span class="ot">&lt;-</span></span>
+<span id="cb22-41"><a href="#cb22-41" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(<span class="sc">~</span>., <span class="at">data =</span> iris) <span class="sc">%&gt;%</span></span>
+<span id="cb22-42"><a href="#cb22-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_mutate</span>(</span>
+<span id="cb22-43"><a href="#cb22-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">bad_approach =</span> Sepal.Width <span class="sc">*</span> const,</span>
+<span id="cb22-44"><a href="#cb22-44" aria-hidden="true" tabindex="-1"></a>    <span class="at">best_approach =</span> Sepal.Width <span class="sc">*</span> <span class="sc">!!</span>const</span>
+<span id="cb22-45"><a href="#cb22-45" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb22-46"><a href="#cb22-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prep</span>(<span class="at">training =</span> iris)</span>
+<span id="cb22-47"><a href="#cb22-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-48"><a href="#cb22-48" aria-hidden="true" tabindex="-1"></a><span class="fu">bake</span>(qq_rec, <span class="at">new_data =</span> <span class="cn">NULL</span>, <span class="fu">contains</span>(<span class="st">"appro"</span>)) <span class="sc">%&gt;%</span> <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>)</span>
+<span id="cb22-49"><a href="#cb22-49" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 4 × 2</span></span>
+<span id="cb22-50"><a href="#cb22-50" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   bad_approach best_approach</span></span>
+<span id="cb22-51"><a href="#cb22-51" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;          &lt;dbl&gt;         &lt;dbl&gt;</span></span>
+<span id="cb22-52"><a href="#cb22-52" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1         4.95          4.95</span></span>
+<span id="cb22-53"><a href="#cb22-53" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2         4.24          4.24</span></span>
+<span id="cb22-54"><a href="#cb22-54" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3         4.52          4.52</span></span>
+<span id="cb22-55"><a href="#cb22-55" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4         4.38          4.38</span></span>
+<span id="cb22-56"><a href="#cb22-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-57"><a href="#cb22-57" aria-hidden="true" tabindex="-1"></a><span class="co"># The difference:</span></span>
+<span id="cb22-58"><a href="#cb22-58" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(qq_rec, <span class="at">number =</span> <span class="dv">1</span>)</span>
+<span id="cb22-59"><a href="#cb22-59" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 2 × 3</span></span>
+<span id="cb22-60"><a href="#cb22-60" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   terms         value               id          </span></span>
+<span id="cb22-61"><a href="#cb22-61" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;         &lt;chr&gt;               &lt;chr&gt;       </span></span>
+<span id="cb22-62"><a href="#cb22-62" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 bad_approach  Sepal.Width * const mutate_Bv7YY</span></span>
+<span id="cb22-63"><a href="#cb22-63" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 best_approach Sepal.Width * 1.414 mutate_Bv7YY</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>首先，定义了一个 <code>recipe</code>，该 <code>recipe</code> 对 <code>iris</code> 数据集的 <code>Sepal.Width</code> 和 <code>Sepal.Length</code> 列进行了变换，创建了两个新的列 <code>dbl_width</code>（等于 <code>Sepal.Width</code> 的两倍）和 <code>half_length</code>（等于 <code>Sepal.Length</code> 的一半）。然后，使用 <code>prep()</code> 函数准备（或训练）这个 <code>recipe</code>，得到了预处理步骤的结果。</p>
+<p>接着，使用 <code>dplyr</code> 手动对训练集和测试集进行了相同的预处理步骤，并使用 <code>all.equal()</code> 检查手动处理后的结果是否与使用 <code>recipes</code> 得到的结果一致。结果表明，两种方式得到的结果是一致的。</p>
+<p>然后，介绍了嵌入常数对象的正确方法。在这部分的 <code>recipe</code> 中，通过对变量 <code>Sepal.Width</code> 乘以一个常数 <code>const</code> 来生成新的变量。这里使用了 <code>!!</code> 符号来强制评估 <code>const</code>。这种做法被称为“非标准评估”（non-standard evaluation, NSE），是 <code>tidyverse</code> 软件包中经常用到的一种技巧。在这种情况下，如果不使用 <code>!!</code>，那么 <code>const</code> 会被当作一个字符串，而不是其对应的值。</p>
+<p>最后，使用 <code>tidy()</code> 函数查看了 <code>recipe</code> 中预处理步骤的详细情况。从输出中可以看到，在 <code>best_approach</code> 列的预处理中，常数 <code>const</code> 已经被替换为其实际值 <code>1.414</code>。</p>
+<p>总的来说，这个示例展示了如何使用 <code>recipes</code> 包进行数据预处理，以及在处理过程中如何正确地处理嵌入的对象。</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./14.tidymodels-list.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">常见模型和软件包</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./30.tidymodels-example.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Example of tidymodels</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

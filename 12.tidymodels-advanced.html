@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>R Models - 2&nbsp; Advanced tidymodels</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./13.tidymodels-extra.html" rel="next">
+<link href="./11.tidymodels-basic.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./10.tidymodels-intro.html">Machine Learning with Tidymodels</a></li><li class="breadcrumb-item"><a href="./12.tidymodels-advanced.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Advanced tidymodels</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">R Models</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./10.tidymodels-intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Machine Learning with Tidymodels</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11.tidymodels-basic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Basic tidymodels</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./12.tidymodels-advanced.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Advanced tidymodels</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./13.tidymodels-extra.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Extra tidymodels</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./14.tidymodels-list.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">常见模型和软件包</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./15.tidymodels-recipes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">特征工程</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./30.tidymodels-example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Example of tidymodels</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./20.data-mining.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data mining with R</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./21.house-price-pred-lm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Linear Model For House Price Predication</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Summary</span></span>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./95.references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#使用-recipes-进行特征工程" id="toc-使用-recipes-进行特征工程" class="nav-link active" data-scroll-target="#使用-recipes-进行特征工程"><span class="header-section-number">2.1</span> 使用 recipes 进行特征工程</a>
+  <ul class="collapse">
+  <li><a href="#特征工程的软件包" id="toc-特征工程的软件包" class="nav-link" data-scroll-target="#特征工程的软件包"><span class="header-section-number">2.1.1</span> 特征工程的软件包</a></li>
+  <li><a href="#对时间变量进行特征提取" id="toc-对时间变量进行特征提取" class="nav-link" data-scroll-target="#对时间变量进行特征提取"><span class="header-section-number">2.1.2</span> 对时间变量进行特征提取</a></li>
+  <li><a href="#对因子变量进行特征提取" id="toc-对因子变量进行特征提取" class="nav-link" data-scroll-target="#对因子变量进行特征提取"><span class="header-section-number">2.1.3</span> 对因子变量进行特征提取</a></li>
+  </ul></li>
+  <li><a href="#对-agent-进行特征工程" id="toc-对-agent-进行特征工程" class="nav-link" data-scroll-target="#对-agent-进行特征工程"><span class="header-section-number">2.2</span> 对 agent 进行特征工程</a>
+  <ul class="collapse">
+  <li><a href="#使用分类汇总" id="toc-使用分类汇总" class="nav-link" data-scroll-target="#使用分类汇总"><span class="header-section-number">2.2.1</span> 使用分类汇总</a></li>
+  <li><a href="#使用哈希编码" id="toc-使用哈希编码" class="nav-link" data-scroll-target="#使用哈希编码"><span class="header-section-number">2.2.2</span> 使用哈希编码</a></li>
+  </ul></li>
+  <li><a href="#debug-recipes" id="toc-debug-recipes" class="nav-link" data-scroll-target="#debug-recipes"><span class="header-section-number">2.3</span> Debug recipes</a></li>
+  <li><a href="#参考资料" id="toc-参考资料" class="nav-link" data-scroll-target="#参考资料"><span class="header-section-number">2.4</span> 参考资料</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Advanced tidymodels</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="使用-recipes-进行特征工程" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="使用-recipes-进行特征工程"><span class="header-section-number">2.1</span> 使用 recipes 进行特征工程</h2>
+<p><strong>特征工程（Feature Engineering）</strong>是指将原始数据转化为模型可以利用的特征的过程。通过这个过程，我们能够更好地表示潜在问题，从而提高模型的性能。</p>
+<p><strong>特征（Feature）</strong>可以理解为模型预测所需要的某种表示或者属性。譬如在房价预测问题中，房屋的面积、房间数量、地段等都可以被视为特征。</p>
+<p>以下是一些常见的特征表示：</p>
+<ul>
+<li><p><strong>交互项（Interactions）</strong>：这是通过组合原有的特征创建新的特征。例如，如果我们有两个特征 A 和 B，我们可以创建一个新的特征 A*B 来表示 A 和 B 的交互效应。</p></li>
+<li><p><strong>多项式扩展/样条函数（Polynomial expansions/splines）</strong>：这是通过对原有特征进行非线性转换创建新的特征。例如，如果我们有一个特征 X，我们可以创建新的特征 X^2, X^3 等来捕捉 X 的非线性效应<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>。</p></li>
+</ul>
+<ul>
+<li><strong>主成分分析（PCA）特征提取</strong>：这是一种降维技术，通过将原有的多个特征转化为少数几个主成分（也就是新的特征），从而保留数据中的主要信息。这种方法通常用于处理具有多重共线性的高维数据。</li>
+</ul>
+<p>以上就是特征工程的基本概念以及一些常见的特征表示方式。通过合适的特征工程，我们能够提取出更有价值的信息，从而帮助模型更好地理解和预测问题。</p>
+<section id="特征工程的软件包" class="level3" data-number="2.1.1">
+<h3 data-number="2.1.1" class="anchored" data-anchor-id="特征工程的软件包"><span class="header-section-number">2.1.1</span> 特征工程的软件包</h3>
+<p><code>recipes</code> 包是 R 语言中的一个用于数据预处理和特征工程的工具包。它提供了一种灵活且强大的方式来创建和管理模型需要的预处理步骤。这些步骤可以包括数据清洗、数据转换、特征选择、特征构建等。</p>
+<p>以下是 <code>recipes</code> 包的一些主要功能：</p>
+<ol type="1">
+<li><p><strong>数据预处理</strong>：<code>recipes</code> 包提供了许多函数来进行数据预处理，如缩放和中心化（标准化）、处理缺失值、离群值检测和处理等。</p></li>
+<li><p><strong>特征选择</strong>：<code>recipes</code> 包可以帮助我们选择最重要的特征，以降低模型的复杂性和过拟合的风险。</p></li>
+<li><p><strong>特征工程</strong>：<code>recipes</code> 包可以用于创建新的特征，如基于现有特征的数学变换（例如平方、对数变换等）、交互项、虚拟变量（独热编码）等。</p></li>
+<li><p><strong>简易操作</strong>：所有的预处理步骤都可以被封装在一个 “recipe” 对象中，这使得整个预处理过程更加组织化和可复现。</p></li>
+</ol>
+<p>总的来说，<code>recipes</code> 包是一个非常有用的工具，它可以帮助我们更有效地进行数据预处理和特征工程，并应用到模型开发的工作流程中。</p>
+</section>
+<section id="对时间变量进行特征提取" class="level3" data-number="2.1.2">
+<h3 data-number="2.1.2" class="anchored" data-anchor-id="对时间变量进行特征提取"><span class="header-section-number">2.1.2</span> 对时间变量进行特征提取</h3>
+<p>对时间变量进行特征提取有很多常见的方法，以下是一些例子：</p>
+<ol type="1">
+<li><p><strong>时间分解</strong>：将时间戳分解为年、月、日、小时、分钟和秒。这可以帮助我们理解时间的不同组成部分如何影响目标变量。</p></li>
+<li><p><strong>季节性特征</strong>：你可以创建表示季节性信息的特征，如季度、月份、一周中的哪一天、一天中的哪个时段等。</p></li>
+<li><p><strong>节假日和事件</strong>：如果数据中包含特定的节假日或事件，这可能会影响到目标变量。此时，可以创建一个二元特征来表示这些特殊的日期或事件。</p></li>
+<li><p><strong>时间间隔</strong>：计算两个日期之间的时间差，例如用户上次购买产品到现在的天数。</p></li>
+<li><p><strong>趋势</strong>：如果你的数据集跨越了很长一段时间，那么可能存在一些长期趋势。在这种情况下，你可以创建一个特征来捕捉这种趋势，例如数据点距离开始日期的天数。</p></li>
+<li><p><strong>滑动窗口统计</strong>：例如过去7天或30天的平均值、最小值、最大值等。</p></li>
+</ol>
+<p>这些只是一部分常见的处理时间变量的策略，具体采用哪种策略需要结合实际的业务场景和问题来决定。</p>
+</section>
+<section id="对因子变量进行特征提取" class="level3" data-number="2.1.3">
+<h3 data-number="2.1.3" class="anchored" data-anchor-id="对因子变量进行特征提取"><span class="header-section-number">2.1.3</span> 对因子变量进行特征提取</h3>
+<p>对因子变量进行特征提取的方法有很多种，下面列出了一些常见的方法：</p>
+<ol type="1">
+<li><p><strong>独热编码（One-Hot Encoding）</strong>：也被称为虚拟变量，这是最常见的编码方法。每个类别都被转换为一个二元变量（即0或1）。例如，如果有一个颜色的因子变量包含“红色”，“蓝色”和“绿色”三个级别，那么我们可以创建三个新的二元变量，分别表示这个观察是不是红色，是不是蓝色，是不是绿色。</p></li>
+<li><p><strong>标签编码（Label Encoding）</strong>：将每个类别映射到一个整数。这种方式适合于类别之间存在自然顺序的情况，比如评级（高、中、低）。</p></li>
+<li><p><strong>二进制编码（Binary Encoding）</strong>：首先，将所有类别按照一定的顺序编码为连续的整数；然后，将这些整数转换为二进制形式。这种方式特别适合高基数特征，因为它可以大大减少新生成的特征的数量。</p></li>
+<li><p><strong>哈希编码（Hashing Encoding）</strong>：哈希编码通过哈希函数，将类别映射到更小的固定长度的列。这种方式对于处理具有大量类别的变量非常有效。</p></li>
+<li><p><strong>目标编码（Target Encoding）</strong>：也被称为均值编码或者响应编码，这种方式是基于类别目标变量的平均值来对类别进行编码。它可以帮助模型捕捉到类别和目标变量之间可能存在的关系，但是如果不慎重处理，容易导致过拟合。</p></li>
+<li><p><strong>嵌入式方法（Embedding）</strong>：这是一种神经网络处理因子变量的方式，将每个类别映射到一个多维空间中的一个点，可以捕获更复杂的关系。</p></li>
+</ol>
+<p>这些方法各有优缺点，选择哪一种取决于具体的问题和数据。例如，独热编码可能会产生很多列，而哈希编码可能会产生碰撞（不同的类别映射到同一哈希值）。</p>
+<p>下面以房价预测模型为例，展示对数据中的因子变量进行特征提取的方法。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># recipes-startup</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching packages ────────────────────────────────────── tidymodels 1.1.1 ──</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ broom        1.0.5     ✔ recipes      1.0.9
+✔ dials        1.2.0     ✔ rsample      1.2.0
+✔ dplyr        1.1.4     ✔ tibble       3.2.1
+✔ ggplot2      3.4.4     ✔ tidyr        1.3.0
+✔ infer        1.0.5     ✔ tune         1.1.2
+✔ modeldata    1.2.0     ✔ workflows    1.1.3
+✔ parsnip      1.1.1     ✔ workflowsets 1.0.1
+✔ purrr        1.0.2     ✔ yardstick    1.2.0</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Conflicts ───────────────────────────────────────── tidymodels_conflicts() ──
+✖ purrr::discard() masks scales::discard()
+✖ dplyr::filter()  masks stats::filter()
+✖ dplyr::lag()     masks stats::lag()
+✖ recipes::step()  masks stats::step()
+• Search for functions across packages at https://www.tidymodels.org/find/</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(modeldatatoo)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Add another package:</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(textrecipes)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Max's usual settings: </span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">tidymodels_prefer</span>()</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_bw</span>())</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">pillar.advice =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">pillar.min_title_chars =</span> <span class="cn">Inf</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># data-import</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(hotel_rates)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">295</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>hotel_rates <span class="ot">&lt;-</span> </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  hotel_rates <span class="sc">%&gt;%</span> </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_n</span>(<span class="dv">5000</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(arrival_date) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>arrival_date) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">company =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(company)),</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">country =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(country)),</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">agent =</span> <span class="fu">factor</span>(<span class="fu">as.character</span>(agent))</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">4028</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>hotel_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(hotel_rates, <span class="at">strata =</span> avg_price_per_room)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>hotel_train <span class="ot">&lt;-</span> <span class="fu">training</span>(hotel_split)</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>hotel_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(hotel_split)</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>hotel_rs <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(hotel_train, <span class="at">strata =</span> avg_price_per_room)</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>hotel_rs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>#  10-fold cross-validation using stratification 
+# A tibble: 10 × 2
+   splits             id    
+   &lt;list&gt;             &lt;chr&gt; 
+ 1 &lt;split [3372/377]&gt; Fold01
+ 2 &lt;split [3373/376]&gt; Fold02
+ 3 &lt;split [3373/376]&gt; Fold03
+ 4 &lt;split [3373/376]&gt; Fold04
+ 5 &lt;split [3373/376]&gt; Fold05
+ 6 &lt;split [3374/375]&gt; Fold06
+ 7 &lt;split [3375/374]&gt; Fold07
+ 8 &lt;split [3376/373]&gt; Fold08
+ 9 &lt;split [3376/373]&gt; Fold09
+10 &lt;split [3376/373]&gt; Fold10</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>hotel_rec <span class="ot">&lt;-</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(avg_price_per_room <span class="sc">~</span> ., <span class="at">data =</span> hotel_train) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_corr</span>(<span class="fu">all_numeric_predictors</span>(), <span class="at">threshold =</span> <span class="fl">0.9</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hotel_rec)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 27 × 4
+   variable                type      role      source  
+   &lt;chr&gt;                   &lt;list&gt;    &lt;chr&gt;     &lt;chr&gt;   
+ 1 lead_time               &lt;chr [2]&gt; predictor original
+ 2 stays_in_weekend_nights &lt;chr [2]&gt; predictor original
+ 3 stays_in_week_nights    &lt;chr [2]&gt; predictor original
+ 4 adults                  &lt;chr [2]&gt; predictor original
+ 5 children                &lt;chr [2]&gt; predictor original
+ 6 babies                  &lt;chr [2]&gt; predictor original
+ 7 meal                    &lt;chr [3]&gt; predictor original
+ 8 country                 &lt;chr [3]&gt; predictor original
+ 9 market_segment          &lt;chr [3]&gt; predictor original
+10 distribution_channel    &lt;chr [3]&gt; predictor original
+# ℹ 17 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>hotel_rec <span class="ot">&lt;-</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(avg_price_per_room <span class="sc">~</span> ., <span class="at">data =</span> hotel_train) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  embed<span class="sc">::</span><span class="fu">step_umap</span>(<span class="fu">all_numeric_predictors</span>(), <span class="at">outcome =</span> <span class="fu">vars</span>(avg_price_per_room))</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hotel_rec)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 27 × 4
+   variable                type      role      source  
+   &lt;chr&gt;                   &lt;list&gt;    &lt;chr&gt;     &lt;chr&gt;   
+ 1 lead_time               &lt;chr [2]&gt; predictor original
+ 2 stays_in_weekend_nights &lt;chr [2]&gt; predictor original
+ 3 stays_in_week_nights    &lt;chr [2]&gt; predictor original
+ 4 adults                  &lt;chr [2]&gt; predictor original
+ 5 children                &lt;chr [2]&gt; predictor original
+ 6 babies                  &lt;chr [2]&gt; predictor original
+ 7 meal                    &lt;chr [3]&gt; predictor original
+ 8 country                 &lt;chr [3]&gt; predictor original
+ 9 market_segment          &lt;chr [3]&gt; predictor original
+10 distribution_channel    &lt;chr [3]&gt; predictor original
+# ℹ 17 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>hotel_rec <span class="ot">&lt;-</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(avg_price_per_room <span class="sc">~</span> ., <span class="at">data =</span> hotel_train) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  embed<span class="sc">::</span><span class="fu">step_umap</span>(<span class="fu">all_numeric_predictors</span>(), <span class="at">outcome =</span> <span class="fu">vars</span>(avg_price_per_room))</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hotel_rec)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 27 × 4
+   variable                type      role      source  
+   &lt;chr&gt;                   &lt;list&gt;    &lt;chr&gt;     &lt;chr&gt;   
+ 1 lead_time               &lt;chr [2]&gt; predictor original
+ 2 stays_in_weekend_nights &lt;chr [2]&gt; predictor original
+ 3 stays_in_week_nights    &lt;chr [2]&gt; predictor original
+ 4 adults                  &lt;chr [2]&gt; predictor original
+ 5 children                &lt;chr [2]&gt; predictor original
+ 6 babies                  &lt;chr [2]&gt; predictor original
+ 7 meal                    &lt;chr [3]&gt; predictor original
+ 8 country                 &lt;chr [3]&gt; predictor original
+ 9 market_segment          &lt;chr [3]&gt; predictor original
+10 distribution_channel    &lt;chr [3]&gt; predictor original
+# ℹ 17 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>hotel_rec <span class="ot">&lt;-</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(avg_price_per_room <span class="sc">~</span> ., <span class="at">data =</span> hotel_train) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_spline_natural</span>(arrival_date_num, <span class="at">deg_free =</span> <span class="dv">10</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hotel_rec)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 27 × 4
+   variable                type      role      source  
+   &lt;chr&gt;                   &lt;list&gt;    &lt;chr&gt;     &lt;chr&gt;   
+ 1 lead_time               &lt;chr [2]&gt; predictor original
+ 2 stays_in_weekend_nights &lt;chr [2]&gt; predictor original
+ 3 stays_in_week_nights    &lt;chr [2]&gt; predictor original
+ 4 adults                  &lt;chr [2]&gt; predictor original
+ 5 children                &lt;chr [2]&gt; predictor original
+ 6 babies                  &lt;chr [2]&gt; predictor original
+ 7 meal                    &lt;chr [3]&gt; predictor original
+ 8 country                 &lt;chr [3]&gt; predictor original
+ 9 market_segment          &lt;chr [3]&gt; predictor original
+10 distribution_channel    &lt;chr [3]&gt; predictor original
+# ℹ 17 more rows</code></pre>
+</div>
+</div>
+<p>这段代码主要实现了对数据集 <code>hotel_rates</code> 进行预处理和特征工程的操作。具体来说：</p>
+<ol type="1">
+<li><p><strong>设置环境</strong>：加载需要的库并进行一些通用设置。</p></li>
+<li><p><strong>数据导入和初步处理</strong>：首先从 <code>hotel_rates</code> 数据中随机抽取了5000个样本，然后去除了 <code>arrival_date</code> 列，最后将 <code>company</code>、<code>country</code> 和 <code>agent</code> 三列转换为因子类型。</p></li>
+<li><p><strong>创建交叉验证分割</strong>：使用 <code>vfold_cv</code> 函数对训练集进行10折交叉验证分割，并按照 <code>avg_price_per_room</code> 这一列进行分层抽样。</p></li>
+<li><p><strong>创建数据预处理步骤（recipe）</strong>：使用 <code>recipe</code> 函数创建一个数据预处理食谱。在这个过程中，执行了以下步骤：</p>
+<ul>
+<li>使用 <code>step_dummy</code> 将<strong>所有名义预测变量</strong>转换为虚拟（dummy）变量。</li>
+<li>使用 <code>step_zv</code> 删除所有零方差预测变量。</li>
+<li>使用 <code>step_normalize</code> 对所有数值预测变量进行标准化（即变换为均值为0、标准差为1的正态分布）。</li>
+<li>在第一个食谱中，使用 <code>step_corr</code> 删除所有与其他数值预测变量相关性大于0.9的预测变量。</li>
+<li>在第二、三个食谱中，使用 <code>step_umap</code> 对所有数值预测变量进行UMAP降维，并将 <code>avg_price_per_room</code> 作为目标变量。</li>
+<li>在第四个食谱中，使用 <code>step_spline_natural</code> 对 <code>arrival_date_num</code> 这一预测变量进行自然样条变换。</li>
+</ul></li>
+</ol>
+<p>每次创建完一个食谱后，都使用了 <code>summary</code> 函数查看了该食谱的内容。这样可以帮助我们理解每一步预处理操作对数据的影响。</p>
+<p>下面这段代码首先创建了一个名为 <code>hotel_indicators</code> 的预处理 “recipe”，然后利用这个 “recipe” 和简单线性回归模型建立了一个工作流（workflow），最后使用10折交叉验证的方式对这个工作流进行了拟合并评估模型性能。</p>
+<p>具体步骤包括：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>hotel_indicators <span class="ot">&lt;-</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(avg_price_per_room <span class="sc">~</span> ., <span class="at">data =</span> hotel_train) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_YeoJohnson</span>(lead_time) <span class="sc">%&gt;%</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_spline_natural</span>(arrival_date_num, <span class="at">deg_free =</span> <span class="dv">10</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hotel_indicators)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 27 × 4
+   variable                type      role      source  
+   &lt;chr&gt;                   &lt;list&gt;    &lt;chr&gt;     &lt;chr&gt;   
+ 1 lead_time               &lt;chr [2]&gt; predictor original
+ 2 stays_in_weekend_nights &lt;chr [2]&gt; predictor original
+ 3 stays_in_week_nights    &lt;chr [2]&gt; predictor original
+ 4 adults                  &lt;chr [2]&gt; predictor original
+ 5 children                &lt;chr [2]&gt; predictor original
+ 6 babies                  &lt;chr [2]&gt; predictor original
+ 7 meal                    &lt;chr [3]&gt; predictor original
+ 8 country                 &lt;chr [3]&gt; predictor original
+ 9 market_segment          &lt;chr [3]&gt; predictor original
+10 distribution_channel    &lt;chr [3]&gt; predictor original
+# ℹ 17 more rows</code></pre>
+</div>
+</div>
+<p>这段代码是创建一个预处理数据的 “recipe”。主要步骤如下：</p>
+<ol type="1">
+<li><p><code>recipe(avg_price_per_room ~ ., data = hotel_train)</code>：建立一个recipe对象，其目标（响应变量）是<code>avg_price_per_room</code>，预测变量是<code>hotel_train</code>数据集中的所有其他变量。</p></li>
+<li><p><code>step_YeoJohnson(lead_time)</code>：对<code>lead_time</code>列应用 Yeo-Johnson 变换。Yeo-Johnson 变换是一种用于正态化数据和管理异方差性的方法，可以用于正数、负数和零的数据。</p></li>
+<li><p><code>step_dummy(all_nominal_predictors())</code>：将所有名义型预测变量转换为虚拟（dummy）变量，也就是进行独热编码。这样做能够让我们把包含多类别的名义变量转换为二元变量，使得模型能够处理。</p></li>
+<li><p><code>step_zv(all_predictors())</code>：删除所有零方差预测变量。零方差预测变量是指在所有观察中值都相同的变量，这样的变量对模型预测通常没有帮助。</p></li>
+<li><p><code>step_spline_natural(arrival_date_num, deg_free = 10)</code>：对<code>arrival_date_num</code>这一变量进行自然样条变换，自由度设置为10。样条变换能够帮助处理非线性关系，尤其是当我们预期某个预测变量和响应变量之间存在复杂的非线性关系时。</p></li>
+</ol>
+<p>这个recipe定义了数据预处理和特征工程的步骤，后续可以通过 <code>prep()</code> 和 <code>bake()</code> 函数来实施这个recipe。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>reg_metrics <span class="ot">&lt;-</span> <span class="fu">metric_set</span>(mae, rsq)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>定义评估指标：通过 <code>metric_set(mae, rsq)</code> 命令定义了两个模型评估指标，即平均绝对误差（mean absolute error，mae）和决定系数（R-squared，rsq）。</p>
+<p><span id="eq-metrics"><span class="math display">
+\begin{align}
+MAE &amp;= \frac{1}{n}\sum_{i=1}^n |y_i - \hat{y}_i| \notag \\
+R^2 &amp;= cor(y_i, \hat{y}_i)^2
+\end{align}
+\tag{2.1}</span></span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">9</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>hotel_lm_wflow <span class="ot">&lt;-</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(hotel_indicators) <span class="sc">%&gt;%</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(<span class="fu">linear_reg</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>创建工作流：建立了一个包含预处理 “recipe” 和简单线性回归模型的工作流。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>ctrl <span class="ot">&lt;-</span> <span class="fu">control_resamples</span>(<span class="at">save_pred =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>hotel_lm_res <span class="ot">&lt;-</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  hotel_lm_wflow <span class="sc">%&gt;%</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(hotel_rs, <span class="at">control =</span> ctrl, <span class="at">metrics =</span> reg_metrics)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>→ A | warning: prediction from rank-deficient fit; consider predict(., rankdeficient="NA")</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>There were issues with some computations   A: x1</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>There were issues with some computations   A: x2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>There were issues with some computations   A: x9
+There were issues with some computations   A: x9</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+</div>
+<p>拟合并评估模型：通过 <code>fit_resamples</code> 函数将工作流应用到10折交叉验证的每一个分割中，并计算了在每一个分割中模型的评估指标。结果保存在 <code>hotel_lm_res</code> 中。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(hotel_lm_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 6
+  .metric .estimator   mean     n std_err .config             
+  &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+1 mae     standard   16.7      10 0.251   Preprocessor1_Model1
+2 rsq     standard    0.883    10 0.00532 Preprocessor1_Model1</code></pre>
+</div>
+</div>
+<p>收集评估指标：使用 <code>collect_metrics(hotel_lm_res)</code> 命令收集模型的评估指标。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Since we used `save_pred = TRUE`</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>lm_cv_pred <span class="ot">&lt;-</span> <span class="fu">collect_predictions</span>(hotel_lm_res)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>lm_cv_pred <span class="sc">%&gt;%</span> <span class="fu">print</span>(<span class="at">n =</span> <span class="dv">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3,749 × 5
+  id     .pred  .row avg_price_per_room .config             
+  &lt;chr&gt;  &lt;dbl&gt; &lt;int&gt;              &lt;dbl&gt; &lt;chr&gt;               
+1 Fold01  26.2    31               54   Preprocessor1_Model1
+2 Fold01  23.0    35               48   Preprocessor1_Model1
+3 Fold01  68.9    45               50   Preprocessor1_Model1
+4 Fold01  60.2    47               55   Preprocessor1_Model1
+5 Fold01  48.6    59               52.8 Preprocessor1_Model1
+6 Fold01  49.0    67               49   Preprocessor1_Model1
+7 Fold01  49.0    72               49   Preprocessor1_Model1
+# ℹ 3,742 more rows</code></pre>
+</div>
+</div>
+<p>收集预测结果：因为在 <code>control_resamples</code> 函数中设置了 <code>save_pred = TRUE</code>，所以我们可以通过 <code>collect_predictions(hotel_lm_res)</code> 命令收集模型在10折交叉验证的每一个分割中的预测结果。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Calibration Plot</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-lm-cal-plot</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-width: 5</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-height: 5</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(probably)</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="fu">cal_plot_regression</span>(hotel_lm_res, <span class="at">alpha =</span> <span class="dv">1</span> <span class="sc">/</span> <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="12.tidymodels-advanced_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>绘制校准图：使用 <code>cal_plot_regression</code> 函数绘制了模型的校准图，这是一种用于评估回归模型预测精度的可视化方法。</p>
+</section>
+</section>
+<section id="对-agent-进行特征工程" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="对-agent-进行特征工程"><span class="header-section-number">2.2</span> 对 agent 进行特征工程</h2>
+<section id="使用分类汇总" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="使用分类汇总"><span class="header-section-number">2.2.1</span> 使用分类汇总</h3>
+<p>下面这段代码包括两部分：首先对<code>agent</code>字段进行统计并绘制直方图，然后构建一个新的预处理”recipe”，使用了一个新的步骤：<code>step_other()</code>。</p>
+<p>通过分析发现有一些 <code>agent</code> 出现的频率很低，这种情况下可以将其合并到 <code>other</code> 组中。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>agent_stats <span class="ot">&lt;-</span> </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  hotel_train <span class="sc">%&gt;%</span></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(agent) <span class="sc">%&gt;%</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">ADR =</span> <span class="fu">mean</span>(avg_price_per_room), </span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">num_reservations =</span> <span class="fu">n</span>(),</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">agent =</span> <span class="fu">reorder</span>(agent, ADR))</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>agent_stats <span class="sc">%&gt;%</span>   </span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> num_reservations)) <span class="sc">+</span></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">30</span>, <span class="at">col =</span> <span class="st">"blue"</span>, <span class="at">fill =</span> <span class="st">"blue"</span>, <span class="at">alpha =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Number of reservations per agent"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="12.tidymodels-advanced_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>agent_stats <span class="sc">%&gt;%</span>   </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> ADR)) <span class="sc">+</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">30</span>, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">fill =</span> <span class="st">"red"</span>, <span class="at">alpha =</span> <span class="dv">1</span><span class="sc">/</span><span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Average ADR per agent"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="12.tidymodels-advanced_files/figure-html/unnamed-chunk-10-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>代理统计</strong>：对 <code>hotel_train</code> 数据集按 <code>agent</code> 进行分组，并计算每个代理的平均房价（ADR）和预订数量（num_reservations）。然后, 这些统计信息被用来创建两个直方图，分别显示了每个代理的预订数量和平均ADR。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>retained_agents <span class="ot">&lt;-</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(avg_price_per_room <span class="sc">~</span> ., <span class="at">data =</span> hotel_train) <span class="sc">%&gt;%</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_mutate</span>(<span class="at">original =</span> agent) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_other</span>(agent, <span class="at">threshold =</span> <span class="fl">0.001</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_spline_natural</span>(arrival_date_num, <span class="at">deg_free =</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prep</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tidy</span>(<span class="at">number =</span> <span class="dv">2</span>)</span>
+<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a>(num_agents <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">unique</span>(hotel_train<span class="sc">$</span>agent)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 98</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>(num_other <span class="ot">&lt;-</span> num_agents <span class="sc">-</span> <span class="fu">length</span>(retained_agents<span class="sc">$</span>retained))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 34</code></pre>
+</div>
+</div>
+<p><strong>新的预处理”recipe”</strong>：新的recipe和之前的非常相似，但增加了一个 <code>step_other(agent, threshold = 0.001)</code> 步骤。这一步把所有预测变量中在数据集中出现频率低于阈值（此处为0.001）的 <code>agent</code> 代理标记为 “Other”。然后，该预处理步骤通过 <code>prep()</code> 函数应用在数据上，结果通过 <code>tidy(number = 2)</code> 展示 out。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>hotel_other_rec <span class="ot">&lt;-</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(avg_price_per_room <span class="sc">~</span> ., <span class="at">data =</span> hotel_train) <span class="sc">%&gt;%</span> </span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_YeoJohnson</span>(lead_time) <span class="sc">%&gt;%</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_other</span>(agent, <span class="at">threshold =</span> <span class="fl">0.001</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_spline_natural</span>(arrival_date_num, <span class="at">deg_free =</span> <span class="dv">10</span>)</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>hotel_other_wflow <span class="ot">&lt;-</span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>  hotel_lm_wflow <span class="sc">%&gt;%</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_recipe</span>(hotel_other_rec)</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>hotel_other_res <span class="ot">&lt;-</span></span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a>  hotel_other_wflow <span class="sc">%&gt;%</span></span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(hotel_rs, <span class="at">control =</span> ctrl, <span class="at">metrics =</span> reg_metrics)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>→ A | warning: prediction from rank-deficient fit; consider predict(., rankdeficient="NA")</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>There were issues with some computations   A: x5</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>There were issues with some computations   A: x9</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(hotel_other_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 6
+  .metric .estimator   mean     n std_err .config             
+  &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+1 mae     standard   16.8      10 0.245   Preprocessor1_Model1
+2 rsq     standard    0.883    10 0.00530 Preprocessor1_Model1</code></pre>
+</div>
+</div>
+<p><strong>更新工作流并重新拟合模型</strong>：使用 <code>update_recipe(hotel_other_rec)</code> 更新工作流中的 recipe，然后再次拟合样本，并收集评估指标。</p>
+<p>这段代码的目的是处理那些只有少数观察值的类别变量——这里是 <code>agent</code> 变量。这样做可以避免过拟合，并可能提高模型的泛化能力。</p>
+</section>
+<section id="使用哈希编码" class="level3" data-number="2.2.2">
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="使用哈希编码"><span class="header-section-number">2.2.2</span> 使用哈希编码</h3>
+<p>下面这段代码创建了一个新的预处理 “recipe”，并使用该 “recipe” 更新了工作流，然后再次拟合样本，并收集评估指标。</p>
+<p>主要改变是：在新的 “recipe” 中，对 <code>agent</code> 和 <code>company</code> 使用了哈希虚拟编码（hashing trick）。哈希虚拟编码可以有效地处理高基数的分类特征。这是一种维度约减技术，通过将所有类别映射到更小的固定数量的列来实现。</p>
+<p>具体步骤包括：</p>
+<ol type="1">
+<li><p><strong>创建新的预处理 “recipe”</strong>：新的 “recipe” 包含了以下步骤：</p>
+<ul>
+<li>对 <code>lead_time</code> 进行Yeo-Johnson变换。</li>
+<li>对 <code>agent</code> 和 <code>company</code> 进行哈希虚拟编码（默认生成32个有符号的指示列）。</li>
+<li>对其他名义预测变量进行普通的虚拟编码。</li>
+<li>删除所有零方差预测变量。</li>
+<li>对 <code>arrival_date_num</code> 进行自然样条变换。</li>
+</ul></li>
+<li><p><strong>更新工作流</strong>：使用 <code>update_recipe(hash_rec)</code> 来更新工作流中的 “recipe”。</p></li>
+<li><p><strong>重新拟合模型并收集评估指标</strong>：和之前相同，再次拟合样本，并收集评估指标。</p></li>
+</ol>
+<p>哈希虚拟编码是一种处理高基数分类特征的方法，对于有大量唯一值的分类变量（如 IP 地址，用户 ID 等）非常有用。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>hash_rec <span class="ot">&lt;-</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">recipe</span>(avg_price_per_room <span class="sc">~</span> ., <span class="at">data =</span> hotel_train) <span class="sc">%&gt;%</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_YeoJohnson</span>(lead_time) <span class="sc">%&gt;%</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Defaults to 32 signed indicator columns</span></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy_hash</span>(agent) <span class="sc">%&gt;%</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy_hash</span>(company) <span class="sc">%&gt;%</span></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Regular indicators for the others</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_dummy</span>(<span class="fu">all_nominal_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_zv</span>(<span class="fu">all_predictors</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_spline_natural</span>(arrival_date_num, <span class="at">deg_free =</span> <span class="dv">10</span>)</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>hotel_hash_wflow <span class="ot">&lt;-</span></span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>  hotel_lm_wflow <span class="sc">%&gt;%</span></span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">update_recipe</span>(hash_rec)</span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>hotel_hash_res <span class="ot">&lt;-</span></span>
+<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a>  hotel_hash_wflow <span class="sc">%&gt;%</span></span>
+<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit_resamples</span>(hotel_rs, <span class="at">control =</span> ctrl, <span class="at">metrics =</span> reg_metrics)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>→ A | warning: prediction from rank-deficient fit; consider predict(., rankdeficient="NA")</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>There were issues with some computations   A: x5</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>There were issues with some computations   A: x9</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(hotel_hash_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 6
+  .metric .estimator   mean     n std_err .config             
+  &lt;chr&gt;   &lt;chr&gt;       &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+1 mae     standard   16.7      10 0.254   Preprocessor1_Model1
+2 rsq     standard    0.884    10 0.00572 Preprocessor1_Model1</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="debug-recipes" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="debug-recipes"><span class="header-section-number">2.3</span> Debug recipes</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>hash_rec_fit <span class="ot">&lt;-</span> <span class="fu">prep</span>(hash_rec)</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>hash_rec_fit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Recipe ──────────────────────────────────────────────────────────────────────</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Inputs </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Number of variables by role</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>outcome:    1
+predictor: 26</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Training information </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Training data contained 3749 data points and no incomplete rows.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Operations </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• Yeo-Johnson transformation on: lead_time | Trained</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• Feature hashing with: agent | Trained</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• Feature hashing with: company | Trained</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• Dummy variables from: meal, country, market_segment, ... | Trained</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• Zero variance filter removed: dummyhash_agent_09, ... | Trained</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>• Natural spline expansion: arrival_date_num | Trained</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the transformation coefficient</span></span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(hash_rec_fit, <span class="at">number =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  terms     value id              
+  &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;           
+1 lead_time 0.173 YeoJohnson_IpstB</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get the processed data</span></span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bake</span>(hash_rec_fit, hotel_train <span class="sc">%&gt;%</span> <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>), <span class="fu">contains</span>(<span class="st">"_agent_"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 30
+  dummyhash_agent_01 dummyhash_agent_02 dummyhash_agent_03 dummyhash_agent_04
+               &lt;int&gt;              &lt;int&gt;              &lt;int&gt;              &lt;int&gt;
+1                  0                  0                  0                  0
+2                  0                 -1                  0                  0
+3                  0                  0                  0                  0
+# ℹ 26 more variables: dummyhash_agent_05 &lt;int&gt;, dummyhash_agent_06 &lt;int&gt;,
+#   dummyhash_agent_07 &lt;int&gt;, dummyhash_agent_08 &lt;int&gt;,
+#   dummyhash_agent_10 &lt;int&gt;, dummyhash_agent_11 &lt;int&gt;,
+#   dummyhash_agent_12 &lt;int&gt;, dummyhash_agent_13 &lt;int&gt;,
+#   dummyhash_agent_14 &lt;int&gt;, dummyhash_agent_15 &lt;int&gt;,
+#   dummyhash_agent_16 &lt;int&gt;, dummyhash_agent_18 &lt;int&gt;,
+#   dummyhash_agent_19 &lt;int&gt;, dummyhash_agent_20 &lt;int&gt;, …</code></pre>
+</div>
+</div>
+</section>
+<section id="参考资料" class="level2" data-number="2.4">
+<h2 data-number="2.4" class="anchored" data-anchor-id="参考资料"><span class="header-section-number">2.4</span> 参考资料</h2>
+<ul>
+<li><p>Once <code>fit()</code> is called on a workflow, changing the model does not re-fit the recipe.</p></li>
+<li><p>A list of all known steps is at <a href="https://www.tidymodels.org/find/recipes/" class="uri">https://www.tidymodels.org/find/recipes/</a>.</p></li>
+<li><p>Some steps can be <a href="https://recipes.tidymodels.org/articles/Skipping.html">skipped</a> when using <code>predict()</code>.</p></li>
+<li><p>use <a href="https://www.tmwr.org/categorical.html#feature-hashing">feature hashing</a> to create a smaller set of indicator variables</p></li>
+<li><p>Feature hashing (for more see <a href="https://bookdown.org/max/FES/encoding-predictors-with-many-categories.html"><em>FES</em></a>, <a href="https://smltar.com/mlregression.html#case-study-feature-hashing"><em>SMLTAR</em></a>, and <a href="https://www.tmwr.org/categorical.html#feature-hashing"><em>TMwR</em></a>):</p></li>
+<li><p><a href="https://www.metamorphosite.com/one-way-hash-encryption-sha1-data-software">Hash functions</a> are meant to <em>emulate</em> randomness.</p></li>
+<li><p>The <a href="https://recipes.tidymodels.org/articles/Ordering.html">order</a> of the steps matters.</p></li>
+</ul>
+
+
+</section>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn1"><p>样条（Spline）是一种数学工具，用于在给定的数据点之间创建平滑曲线。它广泛应用于计算机图形学、数据插值和回归分析等领域。<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./11.tidymodels-basic.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Basic tidymodels</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./13.tidymodels-extra.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Extra tidymodels</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

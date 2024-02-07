@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>R Models - 4&nbsp; 常见模型和软件包</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./15.tidymodels-recipes.html" rel="next">
+<link href="./13.tidymodels-extra.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./10.tidymodels-intro.html">Machine Learning with Tidymodels</a></li><li class="breadcrumb-item"><a href="./14.tidymodels-list.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">常见模型和软件包</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">R Models</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./10.tidymodels-intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Machine Learning with Tidymodels</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11.tidymodels-basic.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Basic tidymodels</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./12.tidymodels-advanced.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Advanced tidymodels</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./13.tidymodels-extra.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Extra tidymodels</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./14.tidymodels-list.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">常见模型和软件包</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./15.tidymodels-recipes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">特征工程</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./30.tidymodels-example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Example of tidymodels</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./20.data-mining.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data mining with R</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./21.house-price-pred-lm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Linear Model For House Price Predication</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Summary</span></span>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./95.references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#常见机器学习模型" id="toc-常见机器学习模型" class="nav-link active" data-scroll-target="#常见机器学习模型"><span class="header-section-number">4.1</span> 常见机器学习模型</a>
+  <ul class="collapse">
+  <li><a href="#执行回归任务的模型" id="toc-执行回归任务的模型" class="nav-link" data-scroll-target="#执行回归任务的模型"><span class="header-section-number">4.1.1</span> 执行回归任务的模型</a></li>
+  <li><a href="#执行分类任务的模型" id="toc-执行分类任务的模型" class="nav-link" data-scroll-target="#执行分类任务的模型"><span class="header-section-number">4.1.2</span> 执行分类任务的模型</a></li>
+  </ul></li>
+  <li><a href="#用于机器学习任务的-r-软件包" id="toc-用于机器学习任务的-r-软件包" class="nav-link" data-scroll-target="#用于机器学习任务的-r-软件包"><span class="header-section-number">4.2</span> 用于机器学习任务的 R 软件包</a>
+  <ul class="collapse">
+  <li><a href="#r-软件包的列表" id="toc-r-软件包的列表" class="nav-link" data-scroll-target="#r-软件包的列表"><span class="header-section-number">4.2.1</span> R 软件包的列表</a></li>
+  <li><a href="#神经网络和深度学习的软件包" id="toc-神经网络和深度学习的软件包" class="nav-link" data-scroll-target="#神经网络和深度学习的软件包"><span class="header-section-number">4.2.2</span> 神经网络和深度学习的软件包</a></li>
+  <li><a href="#递归划分的软件包" id="toc-递归划分的软件包" class="nav-link" data-scroll-target="#递归划分的软件包"><span class="header-section-number">4.2.3</span> 递归划分的软件包</a></li>
+  <li><a href="#随机森林的软件包" id="toc-随机森林的软件包" class="nav-link" data-scroll-target="#随机森林的软件包"><span class="header-section-number">4.2.4</span> 随机森林的软件包</a></li>
+  <li><a href="#正则化和收缩方法的软件包" id="toc-正则化和收缩方法的软件包" class="nav-link" data-scroll-target="#正则化和收缩方法的软件包"><span class="header-section-number">4.2.5</span> 正则化和收缩方法的软件包</a></li>
+  <li><a href="#增强和梯度下降的软件包" id="toc-增强和梯度下降的软件包" class="nav-link" data-scroll-target="#增强和梯度下降的软件包"><span class="header-section-number">4.2.6</span> 增强和梯度下降的软件包</a></li>
+  <li><a href="#支持向量机和核方法的软件包" id="toc-支持向量机和核方法的软件包" class="nav-link" data-scroll-target="#支持向量机和核方法的软件包"><span class="header-section-number">4.2.7</span> 支持向量机和核方法的软件包</a></li>
+  <li><a href="#贝叶斯方法的软件包" id="toc-贝叶斯方法的软件包" class="nav-link" data-scroll-target="#贝叶斯方法的软件包"><span class="header-section-number">4.2.8</span> 贝叶斯方法的软件包</a></li>
+  <li><a href="#提供遗传算法的软件包" id="toc-提供遗传算法的软件包" class="nav-link" data-scroll-target="#提供遗传算法的软件包"><span class="header-section-number">4.2.9</span> 提供遗传算法的软件包</a></li>
+  <li><a href="#关联规则分析的软件包" id="toc-关联规则分析的软件包" class="nav-link" data-scroll-target="#关联规则分析的软件包"><span class="header-section-number">4.2.10</span> 关联规则分析的软件包</a></li>
+  <li><a href="#模糊规则系统的软件包" id="toc-模糊规则系统的软件包" class="nav-link" data-scroll-target="#模糊规则系统的软件包"><span class="header-section-number">4.2.11</span> 模糊规则系统的软件包</a></li>
+  <li><a href="#模型选择和验证的软件包" id="toc-模型选择和验证的软件包" class="nav-link" data-scroll-target="#模型选择和验证的软件包"><span class="header-section-number">4.2.12</span> 模型选择和验证的软件包</a></li>
+  <li><a href="#因果分析的软件包" id="toc-因果分析的软件包" class="nav-link" data-scroll-target="#因果分析的软件包"><span class="header-section-number">4.2.13</span> 因果分析的软件包</a></li>
+  <li><a href="#其它程序" id="toc-其它程序" class="nav-link" data-scroll-target="#其它程序"><span class="header-section-number">4.2.14</span> 其它程序</a></li>
+  <li><a href="#用于机器学习的宏包" id="toc-用于机器学习的宏包" class="nav-link" data-scroll-target="#用于机器学习的宏包"><span class="header-section-number">4.2.15</span> 用于机器学习的宏包</a></li>
+  <li><a href="#可视化的软件包" id="toc-可视化的软件包" class="nav-link" data-scroll-target="#可视化的软件包"><span class="header-section-number">4.2.16</span> 可视化的软件包</a></li>
+  <li><a href="#可解释人工智能的软件包" id="toc-可解释人工智能的软件包" class="nav-link" data-scroll-target="#可解释人工智能的软件包"><span class="header-section-number">4.2.17</span> 可解释人工智能的软件包</a></li>
+  </ul></li>
+  <li><a href="#一些新的机器学习领域概念" id="toc-一些新的机器学习领域概念" class="nav-link" data-scroll-target="#一些新的机器学习领域概念"><span class="header-section-number">4.3</span> 一些新的机器学习领域概念</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">常见模型和软件包</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Created with AI
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>该部分内容由 ChatGPT 等生成式 AI 工具参与创作，可能存在的问题如下：</p>
+<ul>
+<li>其中的说法可能并不准确，包括张冠李戴、时效性等方面可能存在问题。</li>
+<li>其中的一些代码虽然已经经过调试，可以正常运行，但是可能并不符合现下的编程规范或者推荐用法。</li>
+</ul>
+<p>尽管如此，这些内容还是具有较大的参考意义的。</p>
+<p>使用过程中请自行甄别。</p>
+<p>欢迎提出修改完善的建议。</p>
+</div>
+</div>
+<section id="常见机器学习模型" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="常见机器学习模型"><span class="header-section-number">4.1</span> 常见机器学习模型</h2>
+<p><code>tidymodels</code> 中包含了很多不同的模型（<a href="https://www.tidymodels.org/find/parsnip/" class="uri">https://www.tidymodels.org/find/parsnip/</a>）。</p>
+<section id="执行回归任务的模型" class="level3" data-number="4.1.1">
+<h3 data-number="4.1.1" class="anchored" data-anchor-id="执行回归任务的模型"><span class="header-section-number">4.1.1</span> 执行回归任务的模型</h3>
+<p>仅就执行”回归“任务的模型而言，有下面这些。</p>
+<ol type="1">
+<li><strong>Boosted ARIMA Regression Models</strong>: 这种方法结合了自回归综合移动平均(ARIMA)和增强算法。主要用于时间序列预测。</li>
+<li><strong>ADAM Regression Models</strong>: ADAM指的是自适应动态自回归移动平均模型，也主要用于时间序列预测。</li>
+<li><strong>ARIMA Regression Models</strong>: ARIMA模型是一种常见的时间序列预测模型。</li>
+<li><strong>Automatic machine learning</strong>: 自动机器学习(AutoML)是一种自动化选择最佳算法和参数的过程。</li>
+<li><strong>Bagged MARS</strong>: Bagged MARS结合了多重自适应回归样条(MARS)和装袋(bagging)技术以提高预测精度。</li>
+<li><strong>Bagged neural networks</strong>: 这种方法结合了神经网络和装袋算法以提升稳健性。</li>
+<li><strong>Bagged trees</strong>: 袋装决策树是一种集成学习方法，提高模型准确性和防止过拟合。</li>
+<li><strong>Bayesian additive regression trees</strong>: BART 是一种贝叶斯方法，可用于处理线性和非线性问题。</li>
+<li><strong>Boosted PROPHET Time Series Models</strong>: 结合了 Facebook’s Prophet 时间序列预测方法和 boosting 方法。</li>
+<li><strong>Boosted trees</strong>: 提升树模型是一种预测模型，使用梯度提升构建强学习器。</li>
+<li><strong>Cubist rule-based regression models</strong>: Cubist 是一种基于规则的回归模型，能够适应非线性关系。</li>
+<li><strong>Decision trees</strong>: 决策树是一种基本的分类和回归方法。</li>
+<li><strong>Exponential Smoothing State Space Models</strong>: 也被称为 ETS，主要用于时间序列分析。</li>
+<li><strong>Generalized additive models</strong>: GAM 是一种灵活的线性回归方法，能处理非线性的关系。</li>
+<li><strong>K-nearest neighbors</strong>: KNN 是一种基本的分类和回归方法。</li>
+<li><strong>Linear regression via keras/tensorflow/glmnet/glm</strong>: 这些都是实现线性回归的工具或框架。</li>
+<li><strong>Linear support vector machines (SVMs)</strong>: SVM 是一种类别预测工具，线性 SVM 主要用于二元分类问题。</li>
+<li><strong>Multilayer perceptron</strong>: MLP 是一种前馈神经网络，多用于分类和回归分析。</li>
+<li><strong>Multiple Seasonality Regression Models</strong>: 多季节性回归模型用于处理具有多季节性影响的时间序列数据。</li>
+<li><strong>Multivariate adaptive regression splines</strong>: MARS 是一种灵活的回归方法，适用于高维数据集。</li>
+<li><strong>NAIVE Forecast Models</strong>: NAIVE 模型是一种简单的时间序列预测方法，通常用作基线预测。</li>
+<li><strong>NNETAR Regression Models</strong>: NNETAR 是一种神经网络自回归模型，主要用于时间序列预测。</li>
+<li><strong>Parametric survival regression</strong>: 此方法用于生存分析中，当数据具有时间至事件特性时。</li>
+<li><strong>Poisson regression</strong>: 泊松回归适用于因变量为计数数据的情况。</li>
+</ol>
+</section>
+<section id="执行分类任务的模型" class="level3" data-number="4.1.2">
+<h3 data-number="4.1.2" class="anchored" data-anchor-id="执行分类任务的模型"><span class="header-section-number">4.1.2</span> 执行分类任务的模型</h3>
+<p>此外，执行“分类”任务的模型有：</p>
+<ol type="1">
+<li><strong>Automatic machine learning</strong>: 自动机器学习（AutoML）是一种利用优化算法挑选出最佳算法和参数的过程。这大大降低了人工选择和调整模型的复杂度。</li>
+<li><strong>Bagged MARS</strong>: 这是一种集成学习方法，它结合了多重自适应回归样条（MARS）和装袋（bagging）技术，以提高预测精度。</li>
+<li><strong>Bagged neural networks</strong>: 这是一种集成神经网络的方法。通过创建多个神经网络并取其平均值，可以提升模型的稳定性，并减少过拟合的可能性。</li>
+<li><strong>Bagged trees</strong>: 袋装决策树是一种集成学习策略，可以提高模型的泛化性能，并降低模型的方差。</li>
+<li><strong>Bayesian additive regression trees (BART)</strong>: BART 是一种非参数贝叶斯方法，可以用于处理非线性和交互效应的问题。</li>
+<li><strong>Boosted trees</strong>: 提升树是一种强大的机器学习算法，通过串行构建一系列的小型决策树，每一个新的树学习前面树的错误来进行改进。</li>
+<li><strong>C5.0 rule-based classification models</strong>: C5.0 是一个决策树模型，以及一个规则集的生成器。它比它的前身C4.5 更快，需要更少的内存，并且有一个能提高预测精度的boosting选项。</li>
+<li><strong>Decision trees</strong>: 决策树是一种监督学习方法，适用于分类和回归问题。</li>
+<li><strong>Flexible discriminant analysis (FDA)</strong>: FDA 是一种分类技术，它扩展了线性判别分析（LDA），允许在预测分类时使用非线性函数。</li>
+<li><strong>Generalized additive models (GAM)</strong>: GAM 是一种灵活的线性回归方法，能处理非线性和非参数关系。</li>
+<li><strong>K-nearest neighbors(KNN)</strong>: KNN 是一种基于实例的学习或局部近似和所有计算在分类阶段完成的非泛化机器学习方法。</li>
+<li><strong>Linear discriminant analysis(LDA)</strong>: LDA 是一种分类技术，它寻找最大化类间差异并最小化类内差异的特征投影方向。</li>
+<li><strong>Linear support vector machines (SVMs)</strong>: 线性支持向量机是一种二元分类模型，其决策边界是数据的超平面。</li>
+<li><strong>Logistic regression</strong>: 逻辑回归是一种解决二元分类问题的常见统计方法。</li>
+<li><strong>Multilayer perceptron(MLP)</strong>: MLP 是一种前馈神经网络，它可以处理复杂的数据集，并在多种任务上表现良好。</li>
+<li><strong>Multinomial regression</strong>: 多项式回归是一个用于多类分类的广义线性模型。</li>
+<li><strong>Multivariate adaptive regression splines (MARS)</strong>: MARS 是一种灵活的非线性回归方法，适用于高维问题。</li>
+<li><strong>Naive Bayes models</strong>: 朴素贝叶斯是一种基于应用贝叶斯定理与特征独立假设的简单概率分类器。</li>
+<li><strong>Null model</strong>: 空模型是一个不包含任何预测变量的模型，通常用作比较的基准模型。</li>
+<li><strong>Partial least squares(PLS)</strong>: PLS 是一种处理具有多重共线性数据的回归分析方法。</li>
+<li><strong>多项式支持向量机 (Polynomial SVMs)</strong>： 这是一种基于支持向量机 (SVM) 的分类和回归方法。它通过在输入数据中引入高阶项来处理非线性问题。这使得算法可以在高维空间中找到数据的最优分隔超平面。</li>
+<li><strong>二次判别分析 (Quadratic Discriminant Analysis)</strong>： 这是一种统计分类技术，它使用贝叶斯理论和二次判别分析来估计给定观察值属于哪个类别的概率。它不假设各类别的协方差矩阵相同，所以能够处理更复杂的情况。</li>
+<li><strong>径向基函数支持向量机 (Radial Basis Function SVMs)</strong>： 它是一种使用径向基函数 (RBF) 作为核函数的支持向量机。RBF可以映射输入到无限维的特征空间，使得非线性问题变得线性可解。</li>
+<li><strong>随机森林 (Random forests)</strong>： 这是一种基于决策树的集成学习算法。它通过生成和结合许多个决策树，减少过拟合的风险，并提高预测性能。</li>
+<li><strong>正则化判别分析 (Regularized Discriminant Analysis)</strong>： 它是一种改进的判别分析方法，通过引入正则化参数来防止过拟合。这使得模型既能保持高度的复杂性，又能防止对训练数据的过度拟合。</li>
+<li><strong>RuleFit 模型</strong>: 这是一个对数据生成可解释规则的机器学习模型。它结合了决策树和线性模型的优点，可以生成简单、直观且好理解的规则。</li>
+</ol>
+</section>
+</section>
+<section id="用于机器学习任务的-r-软件包" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="用于机器学习任务的-r-软件包"><span class="header-section-number">4.2</span> 用于机器学习任务的 R 软件包</h2>
+<p>这些模型通过调用背后的软件包或算法实现功能。在 CRAN 的 <a href="https://cran.r-project.org/web/views/MachineLearning.html">MachineLearning Views</a>，就列举了很多这样的软件包。</p>
+<section id="r-软件包的列表" class="level3" data-number="4.2.1">
+<h3 data-number="4.2.1" class="anchored" data-anchor-id="r-软件包的列表"><span class="header-section-number">4.2.1</span> R 软件包的列表</h3>
+<p>这些软件包氛围核心包、常用包和已被归档的包（停止维护的软件包）。</p>
+<p><strong>Core:</strong></p>
+<p><a href="https://cran.r-project.org/web/packages/abess/index.html">abess</a>, <a href="https://cran.r-project.org/web/packages/e1071/index.html">e1071</a>, <a href="https://cran.r-project.org/web/packages/gbm/index.html">gbm</a>, <a href="https://cran.r-project.org/web/packages/kernlab/index.html">kernlab</a>, <a href="https://cran.r-project.org/web/packages/mboost/index.html">mboost</a>, <a href="https://cran.r-project.org/web/packages/nnet/index.html">nnet</a>, <a href="https://cran.r-project.org/web/packages/randomForest/index.html">randomForest</a>, <a href="https://cran.r-project.org/web/packages/rpart/index.html">rpart</a>.</p>
+<p><strong>Regular:</strong></p>
+<p><a href="https://cran.r-project.org/web/packages/adabag/index.html">adabag</a>, <a href="https://cran.r-project.org/web/packages/ahaz/index.html">ahaz</a>, <a href="https://cran.r-project.org/web/packages/ALEPlot/index.html">ALEPlot</a>, <a href="https://cran.r-project.org/web/packages/arules/index.html">arules</a>, <a href="https://cran.r-project.org/web/packages/BART/index.html">BART</a>, <a href="https://cran.r-project.org/web/packages/bartMachine/index.html">bartMachine</a>, <a href="https://cran.r-project.org/web/packages/BayesTree/index.html">BayesTree</a>, <a href="https://cran.r-project.org/web/packages/BDgraph/index.html">BDgraph</a>, <a href="https://cran.r-project.org/web/packages/Boruta/index.html">Boruta</a>, <a href="https://cran.r-project.org/web/packages/bst/index.html">bst</a>, <a href="https://cran.r-project.org/web/packages/C50/index.html">C50</a>, <a href="https://cran.r-project.org/web/packages/caret/index.html">caret</a>, <a href="https://cran.r-project.org/web/packages/CORElearn/index.html">CORElearn</a>, <a href="https://cran.r-project.org/web/packages/Cubist/index.html">Cubist</a>, <a href="https://cran.r-project.org/web/packages/DALEX/index.html">DALEX</a>, <a href="https://cran.r-project.org/web/packages/deepnet/index.html">deepnet</a>, <a href="https://cran.r-project.org/web/packages/dipm/index.html">dipm</a>, <a href="https://cran.r-project.org/web/packages/DoubleML/index.html">DoubleML</a>, <a href="https://cran.r-project.org/web/packages/earth/index.html">earth</a>, <a href="https://cran.r-project.org/web/packages/effects/index.html">effects</a>, <a href="https://cran.r-project.org/web/packages/elasticnet/index.html">elasticnet</a>, <a href="https://cran.r-project.org/web/packages/evclass/index.html">evclass</a>, <a href="https://cran.r-project.org/web/packages/evreg/index.html">evreg</a>, <a href="https://cran.r-project.org/web/packages/evtree/index.html">evtree</a>, <a href="https://cran.r-project.org/web/packages/fastshap/index.html">fastshap</a>, <a href="https://cran.r-project.org/web/packages/frbs/index.html">frbs</a>, <a href="https://cran.r-project.org/web/packages/gamboostLSS/index.html">gamboostLSS</a>, <a href="https://cran.r-project.org/web/packages/glmertree/index.html">glmertree</a>, <a href="https://cran.r-project.org/web/packages/glmnet/index.html">glmnet</a>, <a href="https://cran.r-project.org/web/packages/glmpath/index.html">glmpath</a>, <a href="https://cran.r-project.org/web/packages/GMMBoost/index.html">GMMBoost</a>, <a href="https://cran.r-project.org/web/packages/grf/index.html">grf</a>, <a href="https://cran.r-project.org/web/packages/grplasso/index.html">grplasso</a>, <a href="https://cran.r-project.org/web/packages/grpreg/index.html">grpreg</a>, <a href="https://cran.r-project.org/web/packages/h2o/index.html">h2o</a>, <a href="https://cran.r-project.org/web/packages/hda/index.html">hda</a>, <a href="https://cran.r-project.org/web/packages/hdi/index.html">hdi</a>, <a href="https://cran.r-project.org/web/packages/hdm/index.html">hdm</a>, <a href="https://cran.r-project.org/web/packages/iBreakDown/index.html">iBreakDown</a>, <a href="https://cran.r-project.org/web/packages/ICEbox/index.html">ICEbox</a>, <a href="https://cran.r-project.org/web/packages/iml/index.html">iml</a>, <a href="https://cran.r-project.org/web/packages/ipred/index.html">ipred</a>, <a href="https://cran.r-project.org/web/packages/islasso/index.html">islasso</a>, <a href="https://cran.r-project.org/web/packages/joinet/index.html">joinet</a>, <a href="https://cran.r-project.org/web/packages/kernelshap/index.html">kernelshap</a>, <a href="https://cran.r-project.org/web/packages/klaR/index.html">klaR</a>, <a href="https://cran.r-project.org/web/packages/lars/index.html">lars</a>, <a href="https://cran.r-project.org/web/packages/LiblineaR/index.html">LiblineaR</a>, <a href="https://cran.r-project.org/web/packages/lightgbm/index.html">lightgbm</a>, <a href="https://cran.r-project.org/web/packages/lime/index.html">lime</a>, <a href="https://cran.r-project.org/web/packages/maptree/index.html">maptree</a>, <a href="https://cran.r-project.org/web/packages/mlpack/index.html">mlpack</a>, <a href="https://cran.r-project.org/web/packages/mlr3/index.html">mlr3</a>, <a href="https://cran.r-project.org/web/packages/model4you/index.html">model4you</a>, <a href="https://cran.r-project.org/web/packages/mpath/index.html">mpath</a>, <a href="https://cran.r-project.org/web/packages/naivebayes/index.html">naivebayes</a>, <a href="https://cran.r-project.org/web/packages/ncvreg/index.html">ncvreg</a>, <a href="https://cran.r-project.org/web/packages/nestedcv/index.html">nestedcv</a>, <a href="https://cran.r-project.org/web/packages/OneR/index.html">OneR</a>, <a href="https://cran.r-project.org/web/packages/opusminer/index.html">opusminer</a>, <a href="https://cran.r-project.org/web/packages/pamr/index.html">pamr</a>, <a href="https://cran.r-project.org/web/packages/party/index.html">party</a>, <a href="https://cran.r-project.org/web/packages/partykit/index.html">partykit</a>, <a href="https://cran.r-project.org/web/packages/pdp/index.html">pdp</a>, <a href="https://cran.r-project.org/web/packages/penalized/index.html">penalized</a>, <a href="https://cran.r-project.org/web/packages/picasso/index.html">picasso</a>, <a href="https://cran.r-project.org/web/packages/plotmo/index.html">plotmo</a>, <a href="https://cran.r-project.org/web/packages/pre/index.html">pre</a>, <a href="https://cran.r-project.org/web/packages/quantregForest/index.html">quantregForest</a>, <a href="https://cran.r-project.org/web/packages/quint/index.html">quint</a>, <a href="https://cran.r-project.org/web/packages/randomForestSRC/index.html">randomForestSRC</a>, <a href="https://cran.r-project.org/web/packages/ranger/index.html">ranger</a>, <a href="https://cran.r-project.org/web/packages/Rborist/index.html">Rborist</a>, <a href="https://cran.r-project.org/web/packages/rgenoud/index.html">rgenoud</a>, <a href="https://cran.r-project.org/web/packages/RGF/index.html">RGF</a>, <a href="https://cran.r-project.org/web/packages/RLT/index.html">RLT</a>, <a href="https://cran.r-project.org/web/packages/Rmalschains/index.html">Rmalschains</a>, <a href="https://cran.r-project.org/web/packages/rminer/index.html">rminer</a>, <a href="https://cran.r-project.org/web/packages/ROCR/index.html">ROCR</a>, <a href="https://cran.r-project.org/web/packages/RoughSets/index.html">RoughSets</a>, <a href="https://cran.r-project.org/web/packages/RPMM/index.html">RPMM</a>, <a href="https://cran.r-project.org/web/packages/RSNNS/index.html">RSNNS</a>, <a href="https://cran.r-project.org/web/packages/RWeka/index.html">RWeka</a>, <a href="https://cran.r-project.org/web/packages/RXshrink/index.html">RXshrink</a>, <a href="https://cran.r-project.org/web/packages/sda/index.html">sda</a>, <a href="https://cran.r-project.org/web/packages/semtree/index.html">semtree</a>, <a href="https://cran.r-project.org/web/packages/shapper/index.html">shapper</a>, <a href="https://cran.r-project.org/web/packages/shapr/index.html">shapr</a>, <a href="https://cran.r-project.org/web/packages/shapviz/index.html">shapviz</a>, <a href="https://cran.r-project.org/web/packages/SIS/index.html">SIS</a>, <a href="https://cran.r-project.org/web/packages/splitTools/index.html">splitTools</a>, <a href="https://cran.r-project.org/web/packages/ssgraph/index.html">ssgraph</a>, <a href="https://cran.r-project.org/web/packages/stabs/index.html">stabs</a>, <a href="https://cran.r-project.org/web/packages/SuperLearner/index.html">SuperLearner</a>, <a href="https://cran.r-project.org/web/packages/svmpath/index.html">svmpath</a>, <a href="https://cran.r-project.org/web/packages/tensorflow/index.html">tensorflow</a>, <a href="https://cran.r-project.org/web/packages/tgp/index.html">tgp</a>, <a href="https://cran.r-project.org/web/packages/tidymodels/index.html">tidymodels</a>, <a href="https://cran.r-project.org/web/packages/torch/index.html">torch</a>, <a href="https://cran.r-project.org/web/packages/tree/index.html">tree</a>, <a href="https://cran.r-project.org/web/packages/trtf/index.html">trtf</a>, <a href="https://cran.r-project.org/web/packages/varSelRF/index.html">varSelRF</a>, <a href="https://cran.r-project.org/web/packages/wsrf/index.html">wsrf</a>, <a href="https://cran.r-project.org/web/packages/xgboost/index.html">xgboost</a>.</p>
+<p><strong>Archived:</strong></p>
+<p><a href="https://cran.r-project.org/web/packages/penalizedLDA/index.html">penalizedLDA</a>, <a href="https://cran.r-project.org/web/packages/RcppDL/index.html">RcppDL</a>.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>下面是对这些软件包功能的分类介绍。为了确保一致性，以中英文对照的形式展示。</p>
+</div>
+</div>
+</section>
+<section id="神经网络和深度学习的软件包" class="level3" data-number="4.2.2">
+<h3 data-number="4.2.2" class="anchored" data-anchor-id="神经网络和深度学习的软件包"><span class="header-section-number">4.2.2</span> 神经网络和深度学习的软件包</h3>
+<p>神经网络和深度学习：单隐层神经网络在 nnet 包中实现（随基础 R 一起提供）。RSNNS 包提供了一个接口，可以连接到斯图加特神经网络模拟器（SNNS）。实现深度学习风格的神经网络的包包括 deepnet（前馈神经网络，受限玻尔兹曼机，深度信念网络，堆叠自编码器），RcppDL（已归档）（去噪自编码器，堆叠去噪自编码器，受限玻尔兹曼机，深度信念网络）和 h2o（前馈神经网络，深度自编码器）。tensorflow 包提供了一个接口，可以连接到 tensorflow。torch 包实现了一个接口，可以连接到 libtorch 库。evreg 包中实现的 ENNreg 证据回归神经网络模型可以量化预测不确定性。</p>
+<ul>
+<li><em>Neural Networks and Deep Learning</em> : Single-hidden-layer neural network are implemented in package <a href="https://cran.r-project.org/web/packages/nnet/index.html">nnet</a> (shipped with base R). Package <a href="https://cran.r-project.org/web/packages/RSNNS/index.html">RSNNS</a> offers an interface to the Stuttgart Neural Network Simulator (SNNS). Packages implementing deep learning flavours of neural networks include <a href="https://cran.r-project.org/web/packages/deepnet/index.html">deepnet</a> (feed-forward neural network, restricted Boltzmann machine, deep belief network, stacked autoencoders), <a href="https://cran.r-project.org/web/packages/RcppDL/index.html">RcppDL <em>(archived)</em></a> (denoising autoencoder, stacked denoising autoencoder, restricted Boltzmann machine, deep belief network) and <a href="https://cran.r-project.org/web/packages/h2o/index.html">h2o</a> (feed-forward neural network, deep autoencoders). An interface to <a href="http://www.tensorflow.org/">tensorflow</a> is available in <a href="https://cran.r-project.org/web/packages/tensorflow/index.html">tensorflow</a>. The <a href="https://cran.r-project.org/web/packages/torch/index.html">torch</a>package implements an interface to the <a href="https://pytorch.org/">libtorch library</a>. Prediction uncertainty can be quantified by the ENNreg evidential regression neural network model implemented in <a href="https://cran.r-project.org/web/packages/evreg/index.html">evreg</a>.</li>
+</ul>
+</section>
+<section id="递归划分的软件包" class="level3" data-number="4.2.3">
+<h3 data-number="4.2.3" class="anchored" data-anchor-id="递归划分的软件包"><span class="header-section-number">4.2.3</span> 递归划分的软件包</h3>
+<ul>
+<li><p><strong>递归划分</strong>：根据CART书中的思想，实现了用于回归、分类和生存分析的树结构模型，这些模型在 <a href="https://cran.r-project.org/web/packages/rpart/index.html">rpart</a>（与基础R一起提供）和 <a href="https://cran.r-project.org/web/packages/tree/index.html">tree</a> 中实现。建议使用<a href="https://cran.r-project.org/web/packages/rpart/index.html">rpart</a> 包来计算类似CART的树。<a href="http://www.cs.waikato.ac.nz/~ml/weka/">Weka</a> 提供了丰富的划分算法工具箱，<a href="https://cran.r-project.org/web/packages/RWeka/index.html">RWeka</a>包为此实现提供了接口，包括C4.5的J4.8变体和M5。<a href="https://cran.r-project.org/web/packages/Cubist/index.html">Cubist</a>包适合带有线性回归模型的规则基础模型（类似于树），终端叶子、基于实例的修正和boosting。<a href="https://cran.r-project.org/web/packages/C50/index.html">C50</a>包可以拟合 C5.0 分类树、基于规则的模型、以及这些模型的boosted版本。<a href="https://cran.r-project.org/web/packages/pre/index.html">pre</a> 可以拟合更广泛响应变量类型的基于规则的模型。</p>
+<p>在<a href="https://cran.r-project.org/web/packages/party/index.html">party</a> 和 <a href="https://cran.r-project.org/web/packages/partykit/index.html">partykit</a>包中实现了两种具有无偏变量选择和统计停止准则的递归划分算法。函数 <code>ctree()</code> 基于非参数条件推理过程用于测试响应与每个输入变量之间的独立性，而 <code>mob()</code> 可用于对参数模型进行划分。在<a href="https://cran.r-project.org/web/packages/party/index.html">party</a> 和 <a href="https://cran.r-project.org/web/packages/partykit/index.html">partykit</a>包中也提供了可扩展的工具用于可视化二叉树和响应的节点分布。混合效应模型（GLMMs）的划分可以使用 <a href="https://cran.r-project.org/web/packages/glmertree/index.html">glmertree</a> 包执行；结构方程模型（SEMs）的划分可以使用 <a href="https://cran.r-project.org/web/packages/semtree/index.html">semtree</a> 包执行。 用于可视化树的图形工具在 <a href="https://cran.r-project.org/web/packages/maptree/index.html">maptree</a> 包中可用。</p>
+<p>混合模型的划分由 <a href="https://cran.r-project.org/web/packages/RPMM/index.html">RPMM</a> 执行。</p>
+<p>在 <a href="https://cran.r-project.org/web/packages/partykit/index.html">partykit</a> 中实现了代表树和统一预测和可视化方法的计算基础设施。这种基础设施被 <a href="https://cran.r-project.org/web/packages/evtree/index.html">evtree</a> 包用于实现全局最优树的进化学习。各种包中都有生存树。</p>
+<p>关于异质处理效应的子组识别的树，在<a href="https://cran.r-project.org/web/packages/partykit/index.html">partykit</a>，<a href="https://cran.r-project.org/web/packages/model4you/index.html">model4you</a>，<a href="https://cran.r-project.org/web/packages/dipm/index.html">dipm</a>，<a href="https://cran.r-project.org/web/packages/quint/index.html">quint</a>，<code>pkg("SIDES")</code>，<code>pkg("psica")</code> 和 <code>pkg("MrSGUIDE")</code>包（可能还有更多）中可用。</p></li>
+<li><p><em>Recursive Partitioning</em> : Tree-structured models for regression, classification and survival analysis, following the ideas in the CART book, are implemented in <a href="https://cran.r-project.org/web/packages/rpart/index.html">rpart</a> (shipped with base R) and <a href="https://cran.r-project.org/web/packages/tree/index.html">tree</a>. Package <a href="https://cran.r-project.org/web/packages/rpart/index.html">rpart</a> is recommended for computing CART-like trees. A rich toolbox of partitioning algorithms is available in <a href="http://www.cs.waikato.ac.nz/~ml/weka/">Weka</a>, package <a href="https://cran.r-project.org/web/packages/RWeka/index.html">RWeka</a> provides an interface to this implementation, including the J4.8-variant of C4.5 and M5. The <a href="https://cran.r-project.org/web/packages/Cubist/index.html">Cubist</a> package fits rule-based models (similar to trees) with linear regression models in the terminal leaves, instance-based corrections and boosting. The <a href="https://cran.r-project.org/web/packages/C50/index.html">C50</a> package can fit C5.0 classification trees, rule-based models, and boosted versions of these. <a href="https://cran.r-project.org/web/packages/pre/index.html">pre</a> can fit rule-based models for a wider range of response variable types.</p>
+<p>Two recursive partitioning algorithms with unbiased variable selection and statistical stopping criterion are implemented in package <a href="https://cran.r-project.org/web/packages/party/index.html">party</a> and <a href="https://cran.r-project.org/web/packages/partykit/index.html">partykit</a>. Function <code>ctree()</code> is based on non-parametric conditional inference procedures for testing independence between response and each input variable whereas <code>mob()</code> can be used to partition parametric models. Extensible tools for visualizing binary trees and node distributions of the response are available in package <a href="https://cran.r-project.org/web/packages/party/index.html">party</a> and <a href="https://cran.r-project.org/web/packages/partykit/index.html">partykit</a> as well. Partitioning of mixed-effects models (GLMMs) can be performed with package <a href="https://cran.r-project.org/web/packages/glmertree/index.html">glmertree</a>; partitioning of structural equation models (SEMs) can be performed with package <a href="https://cran.r-project.org/web/packages/semtree/index.html">semtree</a>. Graphical tools for the visualization of trees are available in package <a href="https://cran.r-project.org/web/packages/maptree/index.html">maptree</a>.</p>
+<p>Partitioning of mixture models is performed by <a href="https://cran.r-project.org/web/packages/RPMM/index.html">RPMM</a>.</p>
+<p>Computational infrastructure for representing trees and unified methods for prediction and visualization is implemented in <a href="https://cran.r-project.org/web/packages/partykit/index.html">partykit</a>. This infrastructure is used by package <a href="https://cran.r-project.org/web/packages/evtree/index.html">evtree</a> to implement evolutionary learning of globally optimal trees. Survival trees are available in various packages.</p>
+<p>Trees for subgroup identification with respect to heterogenuous treatment effects are available in packages <a href="https://cran.r-project.org/web/packages/partykit/index.html">partykit</a>, <a href="https://cran.r-project.org/web/packages/model4you/index.html">model4you</a>, <a href="https://cran.r-project.org/web/packages/dipm/index.html">dipm</a>, <a href="https://cran.r-project.org/web/packages/quint/index.html">quint</a>, <code>pkg("SIDES")</code>, <code>pkg("psica")</code>, and <code>pkg("MrSGUIDE")</code> (and probably many more).</p></li>
+</ul>
+</section>
+<section id="随机森林的软件包" class="level3" data-number="4.2.4">
+<h3 data-number="4.2.4" class="anchored" data-anchor-id="随机森林的软件包"><span class="header-section-number">4.2.4</span> 随机森林的软件包</h3>
+<ul>
+<li><p><strong>随机森林</strong>：随机森林算法的参考实现方案，包括回归和分类，在<a href="https://cran.r-project.org/web/packages/randomForest/index.html">randomForest</a>包中都有提供。<a href="https://cran.r-project.org/web/packages/ipred/index.html">ipred</a>包提供用于回归、分类和生存分析的bagging方式，以及通过集成学习结合多个模型的bundling方式。此外，基于条件推断树适应任意尺度测量的响应变量的随机森林变体在<a href="https://cran.r-project.org/web/packages/party/index.html">party</a>包中有实现。<a href="https://cran.r-project.org/web/packages/randomForestSRC/index.html">randomForestSRC</a>实现了Breiman的随机森林对生存、回归和分类问题的统一处理。Quantile回归森林<a href="https://cran.r-project.org/web/packages/quantregForest/index.html">quantregForest</a>允许通过随机森林方法对探索性变量进行数值响应的分位数回归。针对二元数据，<a href="https://cran.r-project.org/web/packages/varSelRF/index.html">varSelRF</a>和<a href="https://cran.r-project.org/web/packages/Boruta/index.html">Boruta</a>包关注通过随机森林算法进行的变量选择。此外，<a href="https://cran.r-project.org/web/packages/ranger/index.html">ranger</a>和<a href="https://cran.r-project.org/web/packages/Rborist/index.html">Rborist</a>包提供了R接口快速实现C++随机森林。在<a href="https://cran.r-project.org/web/packages/RLT/index.html">RLT</a>包中实现了强化学习树，特点是在将来可能重要的变量中进行划分。<a href="https://cran.r-project.org/web/packages/wsrf/index.html">wsrf</a>实现了一个替代性的变量权重法，用于替代传统的随机变量抽样进行变量子空间选择。RGF包是一个接口，连接到Python实现的一种叫做正则化贪婪森林的程序。针对参数模型的随机森林，包括用于预测分布估计的森林，可以在<a href="https://cran.r-project.org/web/packages/trtf/index.html">trtf</a>（可能在审查和截断下的预测转换森林）和<a href="https://cran.r-project.org/web/packages/grf/index.html">grf</a>（泛化随机森林的实现）包中找到。</p></li>
+<li><p><em>Random Forests</em> : The reference implementation of the random forest algorithm for regression and classification is available in package <a href="https://cran.r-project.org/web/packages/randomForest/index.html">randomForest</a>. Package <a href="https://cran.r-project.org/web/packages/ipred/index.html">ipred</a> has bagging for regression, classification and survival analysis as well as bundling, a combination of multiple models via ensemble learning. In addition, a random forest variant for response variables measured at arbitrary scales based on conditional inference trees is implemented in package <a href="https://cran.r-project.org/web/packages/party/index.html">party</a>. <a href="https://cran.r-project.org/web/packages/randomForestSRC/index.html">randomForestSRC</a> implements a unified treatment of Breiman’s random forests for survival, regression and classification problems. Quantile regression forests <a href="https://cran.r-project.org/web/packages/quantregForest/index.html">quantregForest</a> allow to regress quantiles of a numeric response on exploratory variables via a random forest approach. For binary data, The <a href="https://cran.r-project.org/web/packages/varSelRF/index.html">varSelRF</a> and <a href="https://cran.r-project.org/web/packages/Boruta/index.html">Boruta</a> packages focus on variable selection by means for random forest algorithms. In addition, packages <a href="https://cran.r-project.org/web/packages/ranger/index.html">ranger</a> and <a href="https://cran.r-project.org/web/packages/Rborist/index.html">Rborist</a> offer R interfaces to fast C++ implementations of random forests. Reinforcement Learning Trees, featuring splits in variables which will be important down the tree, are implemented in package <a href="https://cran.r-project.org/web/packages/RLT/index.html">RLT</a>. <a href="https://cran.r-project.org/web/packages/wsrf/index.html">wsrf</a> implements an alternative variable weighting method for variable subspace selection in place of the traditional random variable sampling. Package <a href="https://cran.r-project.org/web/packages/RGF/index.html">RGF</a> is an interface to a Python implementation of a procedure called regularized greedy forests. Random forests for parametric models, including forests for the estimation of predictive distributions, are available in packages <a href="https://cran.r-project.org/web/packages/trtf/index.html">trtf</a> (predictive transformation forests, possibly under censoring and trunction) and <a href="https://cran.r-project.org/web/packages/grf/index.html">grf</a> (an implementation of generalised random forests).</p></li>
+</ul>
+</section>
+<section id="正则化和收缩方法的软件包" class="level3" data-number="4.2.5">
+<h3 data-number="4.2.5" class="anchored" data-anchor-id="正则化和收缩方法的软件包"><span class="header-section-number">4.2.5</span> 正则化和收缩方法的软件包</h3>
+<ul>
+<li><p><strong>正规化和收缩方法</strong>：可以使用<a href="https://cran.r-project.org/web/packages/lars/index.html">lars</a>包来拟合带有某些参数估计约束的回归模型。在<a href="https://cran.r-project.org/web/packages/grplasso/index.html">grplasso</a>包中提供了同时更新参数组（即组lasso）的Lasso；<a href="https://cran.r-project.org/web/packages/grpreg/index.html">grpreg</a>包实现了诸如组MCP和组SCAD等其他一些组惩罚模型。可以从<a href="https://cran.r-project.org/web/packages/glmpath/index.html">glmpath</a>包中获得广义线性模型和Cox模型的L1正则化路径，整个lasso或弹性网正则化路径（也在<a href="https://cran.r-project.org/web/packages/elasticnet/index.html">elasticnet</a>中）用于线性回归、逻辑回归和多项式回归模型，可以从<a href="https://cran.r-project.org/web/packages/glmnet/index.html">glmnet</a>包中获得。<a href="https://cran.r-project.org/web/packages/penalized/index.html">penalized</a>包提供了lasso（L1）和ridge（L2）惩罚回归模型（包括GLM和Cox模型）的另一种实现。可以使用<a href="https://cran.r-project.org/web/packages/RXshrink/index.html">RXshrink</a>包生成TRACE显示，当错误为IID Normal时，标识出最大似然或最小MSE风险的收缩程度。<a href="https://cran.r-project.org/web/packages/ahaz/index.html">ahaz</a>包提供了在lasso惩罚下的半参数加性风险模型。Fisher的LDA投影通过可选的LASSO惩罚产生稀疏解，在<a href="https://cran.r-project.org/web/packages/penalizedLDA/index.html">penalizedLDA <em>(archived)</em></a>包中实现。<a href="https://cran.r-project.org/web/packages/pamr/index.html">pamr</a>包实现了收缩质心分类器和基因表达分析的实用工具。<a href="https://cran.r-project.org/web/packages/earth/index.html">earth</a>包中提供了多变量自适应回归样条的实现。各种形式的惩罚判别分析在<a href="https://cran.r-project.org/web/packages/hda/index.html">hda</a>和<a href="https://cran.r-project.org/web/packages/sda/index.html">sda</a>包中实现。<a href="https://cran.r-project.org/web/packages/LiblineaR/index.html">LiblineaR</a>包提供了对LIBLINEAR库的接口。<a href="https://cran.r-project.org/web/packages/ncvreg/index.html">ncvreg</a>包使用坐标下降算法拟合SCAD和MCP回归惩罚下的线性和逻辑回归模型。同样的惩罚也在<a href="https://cran.r-project.org/web/packages/picasso/index.html">picasso</a>包中实现。在非高斯和异方差错误下的Lasso由<a href="https://cran.r-project.org/web/packages/hdm/index.html">hdm</a>估计，包含在高维设定中对Lasso回归和估计处理效果的低维组件的推断。<a href="https://cran.r-project.org/web/packages/SIS/index.html">SIS</a>包实现了广义线性和Cox模型的独立筛选。相关结果的弹性网在<a href="https://cran.r-project.org/web/packages/joinet/index.html">joinet</a>包中提供。通过复合优化共轭算子来拟合使用<a href="https://cran.r-project.org/web/packages/mpath/index.html">mpath</a>包的稳健惩罚广义线性模型和稳健支持向量机。<a href="https://cran.r-project.org/web/packages/islasso/index.html">islasso</a>包提供了基于诱导平滑理念的lasso实现，这可以为所有模型参数获得可靠的p值。最佳子集选择，用于线性、逻辑、Cox等其他回归模型，基于一个快速的多项式时间算法，可从<a href="https://cran.r-project.org/web/packages/abess/index.html">abess</a>包获取。</p></li>
+<li><p><em>Regularized and Shrinkage Methods</em> : Regression models with some constraint on the parameter estimates can be fitted with the <a href="https://cran.r-project.org/web/packages/lars/index.html">lars</a> package. Lasso with simultaneous updates for groups of parameters (groupwise lasso) is available in package <a href="https://cran.r-project.org/web/packages/grplasso/index.html">grplasso</a>; the <a href="https://cran.r-project.org/web/packages/grpreg/index.html">grpreg</a> package implements a number of other group penalization models, such as group MCP and group SCAD. The L1 regularization path for generalized linear models and Cox models can be obtained from functions available in package <a href="https://cran.r-project.org/web/packages/glmpath/index.html">glmpath</a>, the entire lasso or elastic-net regularization path (also in <a href="https://cran.r-project.org/web/packages/elasticnet/index.html">elasticnet</a>) for linear regression, logistic and multinomial regression models can be obtained from package <a href="https://cran.r-project.org/web/packages/glmnet/index.html">glmnet</a>. The <a href="https://cran.r-project.org/web/packages/penalized/index.html">penalized</a> package provides an alternative implementation of lasso (L1) and ridge (L2) penalized regression models (both GLM and Cox models). Package <a href="https://cran.r-project.org/web/packages/RXshrink/index.html">RXshrink</a> can be used to generate TRACE displays that identify the extent of shrinkage with Maximum Likelihood of Minimum MSE Risk when errors are IID Normal. Semiparametric additive hazards models under lasso penalties are offered by package <a href="https://cran.r-project.org/web/packages/ahaz/index.html">ahaz</a>. Fisher’s LDA projection with an optional LASSO penalty to produce sparse solutions is implemented in package <a href="https://cran.r-project.org/web/packages/penalizedLDA/index.html">penalizedLDA <em>(archived)</em></a>. The shrunken centroids classifier and utilities for gene expression analyses are implemented in package <a href="https://cran.r-project.org/web/packages/pamr/index.html">pamr</a>. An implementation of multivariate adaptive regression splines is available in package <a href="https://cran.r-project.org/web/packages/earth/index.html">earth</a>. Various forms of penalized discriminant analysis are implemented in packages <a href="https://cran.r-project.org/web/packages/hda/index.html">hda</a> and <a href="https://cran.r-project.org/web/packages/sda/index.html">sda</a>. Package <a href="https://cran.r-project.org/web/packages/LiblineaR/index.html">LiblineaR</a> offers an interface to the LIBLINEAR library. The <a href="https://cran.r-project.org/web/packages/ncvreg/index.html">ncvreg</a> package fits linear and logistic regression models under the the SCAD and MCP regression penalties using a coordinate descent algorithm. The same penalties are also implemented in the <a href="https://cran.r-project.org/web/packages/picasso/index.html">picasso</a> package. The Lasso under non-Gaussian and heteroscedastic errors is estimated by <a href="https://cran.r-project.org/web/packages/hdm/index.html">hdm</a>, inference on low-dimensional components of Lasso regression and of estimated treatment effects in a high-dimensional setting are also contained. Package <a href="https://cran.r-project.org/web/packages/SIS/index.html">SIS</a> implements sure independence screening in generalised linear and Cox models. Elastic nets for correlated outcomes are available from package <a href="https://cran.r-project.org/web/packages/joinet/index.html">joinet</a>. Robust penalized generalized linear models and robust support vector machines are fitted by package <a href="https://cran.r-project.org/web/packages/mpath/index.html">mpath</a> using composite optimization by conjugation operator. The <a href="https://cran.r-project.org/web/packages/islasso/index.html">islasso</a> package provides an implementation of lasso based on the induced smoothing idea which allows to obtain reliable p-values for all model parameters. Best-subset selection for linear, logistic, Cox and other regression models, based on a fast polynomial time algorithm, is available from package <a href="https://cran.r-project.org/web/packages/abess/index.html">abess</a>.</p></li>
+</ul>
+</section>
+<section id="增强和梯度下降的软件包" class="level3" data-number="4.2.6">
+<h3 data-number="4.2.6" class="anchored" data-anchor-id="增强和梯度下降的软件包"><span class="header-section-number">4.2.6</span> 增强和梯度下降的软件包</h3>
+<ul>
+<li><p><strong>增强和梯度下降</strong>：各种形式的梯度提升在<a href="https://cran.r-project.org/web/packages/gbm/index.html">gbm</a>包中实现（基于树的函数梯度下降提升）。<a href="https://cran.r-project.org/web/packages/lightgbm/index.html">lightgbm</a>和<a href="https://cran.r-project.org/web/packages/xgboost/index.html">xgboost</a>包实现了基于高效树作为基础学习器的树形提升，适用于多个和用户自定义的目标函数。<a href="https://cran.r-project.org/web/packages/bst/index.html">bst</a>包中的提升实现优化了铰链损失。一个可扩展的提升框架，适用于广义线性模型、加法模型和非参数模型，可以在<a href="https://cran.r-project.org/web/packages/mboost/index.html">mboost</a>包中找到。混合模型的似然基提升在<a href="https://cran.r-project.org/web/packages/GMMBoost/index.html">GMMBoost</a>中实现。GAMLSS模型可以通过<a href="https://cran.r-project.org/web/packages/gamboostLSS/index.html">gamboostLSS</a>使用提升来拟合。<a href="https://cran.r-project.org/web/packages/adabag/index.html">adabag</a>实现了经典的AdaBoost算法，并添加了功能，如变量重要性。</p></li>
+<li><p><em>Boosting and Gradient Descent</em> : Various forms of gradient boosting are implemented in package <a href="https://cran.r-project.org/web/packages/gbm/index.html">gbm</a> (tree-based functional gradient descent boosting). Package <a href="https://cran.r-project.org/web/packages/lightgbm/index.html">lightgbm</a> and <a href="https://cran.r-project.org/web/packages/xgboost/index.html">xgboost</a> implement tree-based boosting using efficient trees as base learners for several and also user-defined objective functions. The Hinge-loss is optimized by the boosting implementation in package <a href="https://cran.r-project.org/web/packages/bst/index.html">bst</a>. An extensible boosting framework for generalized linear, additive and nonparametric models is available in package <a href="https://cran.r-project.org/web/packages/mboost/index.html">mboost</a>. Likelihood-based boosting for mixed models is implemented in <a href="https://cran.r-project.org/web/packages/GMMBoost/index.html">GMMBoost</a>. GAMLSS models can be fitted using boosting by <a href="https://cran.r-project.org/web/packages/gamboostLSS/index.html">gamboostLSS</a>. <a href="https://cran.r-project.org/web/packages/adabag/index.html">adabag</a> implements the classical AdaBoost algorithm with added functionality, such as variable importances.</p></li>
+</ul>
+</section>
+<section id="支持向量机和核方法的软件包" class="level3" data-number="4.2.7">
+<h3 data-number="4.2.7" class="anchored" data-anchor-id="支持向量机和核方法的软件包"><span class="header-section-number">4.2.7</span> 支持向量机和核方法的软件包</h3>
+<ul>
+<li><p><strong>支持向量机和核方法</strong>：<a href="https://cran.r-project.org/web/packages/e1071/index.html">e1071</a>中的<code>svm()</code>函数提供了一个接口到LIBSVM库，<a href="https://cran.r-project.org/web/packages/kernlab/index.html">kernlab</a>包实现了一个灵活的核学习框架（包括SVMs、RVMs和其他核学习算法）。<a href="https://cran.r-project.org/web/packages/klaR/index.html">klaR</a>包提供了一个接口到SVMlight实现（仅用于一对所有的分类）。</p></li>
+<li><p><em>Support Vector Machines and Kernel Methods</em> : The function <code>svm()</code> from <a href="https://cran.r-project.org/web/packages/e1071/index.html">e1071</a> offers an interface to the LIBSVM library and package <a href="https://cran.r-project.org/web/packages/kernlab/index.html">kernlab</a> implements a flexible framework for kernel learning (including SVMs, RVMs and other kernel learning algorithms). An interface to the SVMlight implementation (only for one-against-all classification) is provided in package <a href="https://cran.r-project.org/web/packages/klaR/index.html">klaR</a>.</p></li>
+</ul>
+</section>
+<section id="贝叶斯方法的软件包" class="level3" data-number="4.2.8">
+<h3 data-number="4.2.8" class="anchored" data-anchor-id="贝叶斯方法的软件包"><span class="header-section-number">4.2.8</span> 贝叶斯方法的软件包</h3>
+<ul>
+<li><p><strong>贝叶斯方法</strong>：贝叶斯加法回归树（BART）在<a href="https://cran.r-project.org/web/packages/BayesTree/index.html">BayesTree</a>，<a href="https://cran.r-project.org/web/packages/BART/index.html">BART</a> 和 <a href="https://cran.r-project.org/web/packages/bartMachine/index.html">bartMachine</a> 包中有实现，其最终模型是以许多弱学习器的总和定义的（与集成方法类似）。包<a href="https://cran.r-project.org/web/packages/tgp/index.html">tgp</a>提供了贝叶斯非平稳，半参数非线性回归和设计通过高斯过程包含贝叶斯CART和线性模型。包<a href="https://cran.r-project.org/web/packages/BDgraph/index.html">BDgraph</a>实现了针对多变量连续、离散和混合数据的无向图形模型中的贝叶斯结构学习；相应的依赖于尖峰和板状先验的方法可以从<a href="https://cran.r-project.org/web/packages/ssgraph/index.html">ssgraph</a>包中获得。朴素贝叶斯分类器在<a href="https://cran.r-project.org/web/packages/naivebayes/index.html">naivebayes</a>包中提供。</p></li>
+<li><p><em>Bayesian Methods</em> : Bayesian Additive Regression Trees (BART), where the final model is defined in terms of the sum over many weak learners (not unlike ensemble methods), are implemented in packages <a href="https://cran.r-project.org/web/packages/BayesTree/index.html">BayesTree</a>, <a href="https://cran.r-project.org/web/packages/BART/index.html">BART</a>, and <a href="https://cran.r-project.org/web/packages/bartMachine/index.html">bartMachine</a>. Bayesian nonstationary, semiparametric nonlinear regression and design by treed Gaussian processes including Bayesian CART and treed linear models are made available by package <a href="https://cran.r-project.org/web/packages/tgp/index.html">tgp</a>. Bayesian structure learning in undirected graphical models for multivariate continuous, discrete, and mixed data is implemented in package <a href="https://cran.r-project.org/web/packages/BDgraph/index.html">BDgraph</a>; corresponding methods relying on spike-and-slab priors are available from package <a href="https://cran.r-project.org/web/packages/ssgraph/index.html">ssgraph</a>. Naive Bayes classifiers are available in <a href="https://cran.r-project.org/web/packages/naivebayes/index.html">naivebayes</a>.</p></li>
+</ul>
+</section>
+<section id="提供遗传算法的软件包" class="level3" data-number="4.2.9">
+<h3 data-number="4.2.9" class="anchored" data-anchor-id="提供遗传算法的软件包"><span class="header-section-number">4.2.9</span> 提供遗传算法的软件包</h3>
+<ul>
+<li><p><strong>使用遗传算法优化</strong>：<a href="https://cran.r-project.org/web/packages/rgenoud/index.html">rgenoud</a>包提供了基于遗传算法的优化程序。<a href="https://cran.r-project.org/web/packages/Rmalschains/index.html">Rmalschains</a>包实现了带有本地搜索链的遗传算法，这是一种特殊类型的进化算法，结合了稳定状态的遗传算法和本地搜索用于实值参数优化。</p></li>
+<li><p><em>Optimization using Genetic Algorithms</em> : Package <a href="https://cran.r-project.org/web/packages/rgenoud/index.html">rgenoud</a> offers optimization routines based on genetic algorithms. The package <a href="https://cran.r-project.org/web/packages/Rmalschains/index.html">Rmalschains</a> implements memetic algorithms with local search chains, which are a special type of evolutionary algorithms, combining a steady state genetic algorithm with local search for real-valued parameter optimization.</p></li>
+</ul>
+</section>
+<section id="关联规则分析的软件包" class="level3" data-number="4.2.10">
+<h3 data-number="4.2.10" class="anchored" data-anchor-id="关联规则分析的软件包"><span class="header-section-number">4.2.10</span> 关联规则分析的软件包</h3>
+<ul>
+<li><p><strong>关联规则</strong>：<a href="https://cran.r-project.org/web/packages/arules/index.html">arules</a>包为高效处理稀疏二进制数据提供了数据结构，同时为Apriori和Eclat的实现提供了接口，用于挖掘频繁项集、最大频繁项集、封闭频繁项集和关联规则。<a href="https://cran.r-project.org/web/packages/opusminer/index.html">opusminer</a>包提供了一个接口到OPUS Miner算法（在C++中实现），用于有效地找到交易数据中的关键关联，以自给自足的项集的形式，使用杠杆或提升。</p></li>
+<li><p><em>Association Rules</em> : Package <a href="https://cran.r-project.org/web/packages/arules/index.html">arules</a> provides both data structures for efficient handling of sparse binary data as well as interfaces to implementations of Apriori and Eclat for mining frequent itemsets, maximal frequent itemsets, closed frequent itemsets and association rules. Package <a href="https://cran.r-project.org/web/packages/opusminer/index.html">opusminer</a> provides an interface to the OPUS Miner algorithm (implemented in C++) for finding the key associations in transaction data efficiently, in the form of self-sufficient itemsets, using either leverage or lift.</p></li>
+</ul>
+</section>
+<section id="模糊规则系统的软件包" class="level3" data-number="4.2.11">
+<h3 data-number="4.2.11" class="anchored" data-anchor-id="模糊规则系统的软件包"><span class="header-section-number">4.2.11</span> 模糊规则系统的软件包</h3>
+<ul>
+<li><p><strong>模糊规则系统</strong>：<a href="https://cran.r-project.org/web/packages/frbs/index.html">frbs</a>包实现了从数据中学习模糊规则系统的标准方法，用于回归和分类。<a href="https://cran.r-project.org/web/packages/RoughSets/index.html">RoughSets</a>包在一个包中提供了粗糙集论（RST）和模糊粗糙集论（FRST）的全面实现。</p></li>
+<li><p><em>Fuzzy Rule-based Systems</em> : Package <a href="https://cran.r-project.org/web/packages/frbs/index.html">frbs</a> implements a host of standard methods for learning fuzzy rule-based systems from data for regression and classification. Package <a href="https://cran.r-project.org/web/packages/RoughSets/index.html">RoughSets</a> provides comprehensive implementations of the rough set theory (RST) and the fuzzy rough set theory (FRST) in a single package.</p></li>
+</ul>
+</section>
+<section id="模型选择和验证的软件包" class="level3" data-number="4.2.12">
+<h3 data-number="4.2.12" class="anchored" data-anchor-id="模型选择和验证的软件包"><span class="header-section-number">4.2.12</span> 模型选择和验证的软件包</h3>
+<ul>
+<li><p><strong>模型选择和验证</strong>：<a href="https://cran.r-project.org/web/packages/e1071/index.html">e1071</a>包有用于超参数调优的<code>tune()</code>函数，可以使用函数<code>errorest()</code>（来自<a href="https://cran.r-project.org/web/packages/ipred/index.html">ipred</a>）进行错误率估计。可以利用<a href="https://cran.r-project.org/web/packages/svmpath/index.html">svmpath</a>包的功能选择支持向量机的成本参数C。<a href="https://cran.r-project.org/web/packages/splitTools/index.html">splitTools</a>包提供了交叉验证和其他重采样方案的数据分割。<a href="https://cran.r-project.org/web/packages/nestedcv/index.html">nestedcv</a>包为<a href="https://cran.r-project.org/web/packages/glmnet/index.html">glmnet</a>和<a href="https://cran.r-project.org/web/packages/caret/index.html">caret</a>模型提供了嵌套交叉验证。用于ROC分析和比较候选分类器的其他可视化技术的函数可以从<a href="https://cran.r-project.org/web/packages/ROCR/index.html">ROCR</a>包获取。<a href="https://cran.r-project.org/web/packages/hdi/index.html">hdi</a> 和 <a href="https://cran.r-project.org/web/packages/stabs/index.html">stabs</a>包实现了一系列模型的稳定性选择，<a href="https://cran.r-project.org/web/packages/hdi/index.html">hdi</a>还提供了高维模型中的其他推理程序。</p></li>
+<li><p><em>Model selection and validation</em> : Package <a href="https://cran.r-project.org/web/packages/e1071/index.html">e1071</a> has function <code>tune()</code> for hyper parameter tuning and function <code>errorest()</code> (<a href="https://cran.r-project.org/web/packages/ipred/index.html">ipred</a>) can be used for error rate estimation. The cost parameter C for support vector machines can be chosen utilizing the functionality of package <a href="https://cran.r-project.org/web/packages/svmpath/index.html">svmpath</a>. Data splitting for crossvalidation and other resampling schemes is available in the <a href="https://cran.r-project.org/web/packages/splitTools/index.html">splitTools</a> package. Package <a href="https://cran.r-project.org/web/packages/nestedcv/index.html">nestedcv</a> provides nested cross-validation for <a href="https://cran.r-project.org/web/packages/glmnet/index.html">glmnet</a> and <a href="https://cran.r-project.org/web/packages/caret/index.html">caret</a> models. Functions for ROC analysis and other visualisation techniques for comparing candidate classifiers are available from package <a href="https://cran.r-project.org/web/packages/ROCR/index.html">ROCR</a>. Packages <a href="https://cran.r-project.org/web/packages/hdi/index.html">hdi</a> and <a href="https://cran.r-project.org/web/packages/stabs/index.html">stabs</a> implement stability selection for a range of models, <a href="https://cran.r-project.org/web/packages/hdi/index.html">hdi</a>also offers other inference procedures in high-dimensional models.</p></li>
+</ul>
+</section>
+<section id="因果分析的软件包" class="level3" data-number="4.2.13">
+<h3 data-number="4.2.13" class="anchored" data-anchor-id="因果分析的软件包"><span class="header-section-number">4.2.13</span> 因果分析的软件包</h3>
+<ul>
+<li><p><strong>因果机器学习</strong>：<a href="https://cran.r-project.org/web/packages/DoubleML/index.html">DoubleML</a>包是双机器学习框架在各种因果模型中的面向对象实现。基于<a href="https://cran.r-project.org/web/packages/mlr3/index.html">mlr3</a>生态系统，可以基于广泛的机器学习方法估计因果效应。</p></li>
+<li><p><em>Causal Machine Learning</em> : The package <a href="https://cran.r-project.org/web/packages/DoubleML/index.html">DoubleML</a> is an object-oriented implementation of the double machine learning framework in a variety of causal models. Building upon the <a href="https://cran.r-project.org/web/packages/mlr3/index.html">mlr3</a> ecosystem, estimation of causal effects can be based on an extensive collection of machine learning methods.</p></li>
+</ul>
+</section>
+<section id="其它程序" class="level3" data-number="4.2.14">
+<h3 data-number="4.2.14" class="anchored" data-anchor-id="其它程序"><span class="header-section-number">4.2.14</span> 其它程序</h3>
+<ul>
+<li><p><strong>其他程序</strong>：证据分类器在<a href="https://cran.r-project.org/web/packages/evclass/index.html">evclass</a>包中使用Dempster-Shafer质量函数量化关于测试模式类别的不确定性。<a href="https://cran.r-project.org/web/packages/OneR/index.html">OneR</a>（One Rule）包提供了一个分类算法，增强了对缺失值和数字数据的精细处理，以及广泛的诊断功能。</p></li>
+<li><p><em>Other procedures</em> : Evidential classifiers quantify the uncertainty about the class of a test pattern using a Dempster-Shafer mass function in package <a href="https://cran.r-project.org/web/packages/evclass/index.html">evclass</a>. The <a href="https://cran.r-project.org/web/packages/OneR/index.html">OneR</a> (One Rule) package offers a classification algorithm with enhancements for sophisticated handling of missing values and numeric data together with extensive diagnostic functions.</p></li>
+</ul>
+</section>
+<section id="用于机器学习的宏包" class="level3" data-number="4.2.15">
+<h3 data-number="4.2.15" class="anchored" data-anchor-id="用于机器学习的宏包"><span class="header-section-number">4.2.15</span> 用于机器学习的宏包</h3>
+<ul>
+<li><p><strong>宏包</strong>：<a href="https://cran.r-project.org/web/packages/tidymodels/index.html">tidymodels</a>包提供了构建预测模型的杂项函数，包括参数调优和变量重要度度量。同样，<a href="https://cran.r-project.org/web/packages/mlr3/index.html">mlr3</a>包为各种统计和机器学习包提供高级接口。<a href="https://cran.r-project.org/web/packages/SuperLearner/index.html">SuperLearner</a>实现了类似的工具箱。<a href="https://cran.r-project.org/web/packages/h2o/index.html">h2o</a>包实现了一个通用的机器学习平台，其中包含了许多流行算法的可扩展实现，如随机森林、GBM、GLM（带弹性网正则化）和深度学习（前馈多层网络）等等。可以从<a href="https://cran.r-project.org/web/packages/mlpack/index.html">mlpack</a>包获取到mlpack C++库的接口。 <a href="https://cran.r-project.org/web/packages/CORElearn/index.html">CORElearn</a>实现了一类相当广泛的机器学习算法，如最近邻，树，随机森林，以及几种特征选择方法。类似地，<a href="https://cran.r-project.org/web/packages/rminer/index.html">rminer</a>包接口了在其他包中实现的几种学习算法，并计算了几种性能度量。</p></li>
+<li><p><em>Meta packages</em> : Package <a href="https://cran.r-project.org/web/packages/tidymodels/index.html">tidymodels</a> provides miscellaneous functions for building predictive models, including parameter tuning and variable importance measures. In a similar spirit, package <a href="https://cran.r-project.org/web/packages/mlr3/index.html">mlr3</a> offers high-level interfaces to various statistical and machine learning packages. Package <a href="https://cran.r-project.org/web/packages/SuperLearner/index.html">SuperLearner</a> implements a similar toolbox. The <a href="https://cran.r-project.org/web/packages/h2o/index.html">h2o</a> package implements a general purpose machine learning platform that has scalable implementations of many popular algorithms such as random forest, GBM, GLM (with elastic net regularization), and deep learning (feedforward multilayer networks), among others. An interface to the mlpack C++ library is available from package <a href="https://cran.r-project.org/web/packages/mlpack/index.html">mlpack</a>. <a href="https://cran.r-project.org/web/packages/CORElearn/index.html">CORElearn</a> implements a rather broad class of machine learning algorithms, such as nearest neighbors, trees, random forests, and several feature selection methods. Similar, package <a href="https://cran.r-project.org/web/packages/rminer/index.html">rminer</a> interfaces several learning algorithms implemented in other packages and computes several performance measures.</p></li>
+</ul>
+</section>
+<section id="可视化的软件包" class="level3" data-number="4.2.16">
+<h3 data-number="4.2.16" class="anchored" data-anchor-id="可视化的软件包"><span class="header-section-number">4.2.16</span> 可视化的软件包</h3>
+<ul>
+<li><p><strong>可视化</strong>（最初由Brandon Greenwell贡献）：<code>stats::termplot()</code>函数包可以用来绘制预测方法支持 <code>type="terms"</code>的模型中的项。<a href="https://cran.r-project.org/web/packages/effects/index.html">effects</a>包为带有线性预测器的模型（如，线性和广义线性模型）提供了图形和表格效果显示。弗里德曼的部分依赖图（PDPs），这是预测函数的低维度图形渲染，已经在一些包中实现。<a href="https://cran.r-project.org/web/packages/gbm/index.html">gbm</a>，<a href="https://cran.r-project.org/web/packages/randomForest/index.html">randomForest</a> 和 <a href="https://cran.r-project.org/web/packages/randomForestSRC/index.html">randomForestSRC</a> 提供了他们自己的函数来显示PDPs，但仅限于使用那些包拟合的模型（来自<a href="https://cran.r-project.org/web/packages/randomForest/index.html">randomForest</a> 的 <code>partialPlot</code> 函数更受限，因为它一次只允许一个预测器）。<a href="https://cran.r-project.org/web/packages/pdp/index.html">pdp</a>，<a href="https://cran.r-project.org/web/packages/plotmo/index.html">plotmo</a>，和 <a href="https://cran.r-project.org/web/packages/ICEbox/index.html">ICEbox</a> 包更为通用，并允许创建各种机器学习模型的PDPs（例如，随机森林、支持向量机等）；<a href="https://cran.r-project.org/web/packages/pdp/index.html">pdp</a> 和 <a href="https://cran.r-project.org/web/packages/plotmo/index.html">plotmo</a> 都支持多变量显示（<a href="https://cran.r-project.org/web/packages/plotmo/index.html">plotmo</a> 限于两个预测器，而 <a href="https://cran.r-project.org/web/packages/pdp/index.html">pdp</a> 使用trellis图形来显示涉及三个预测器的PDPs）。默认情况下，<a href="https://cran.r-project.org/web/packages/plotmo/index.html">plotmo</a> 将背景变量固定在他们的中位数（或因素的第一级），这比构造PDPs更快，但包含的信息较少。 <a href="https://cran.r-project.org/web/packages/ICEbox/index.html">ICEbox</a>关注于构建个体条件期望（ICE）曲线，这是对Friedman’s PDPs的改进。 ICE curves以及居中的 ICE curves也可以用<a href="https://cran.r-project.org/web/packages/pdp/index.html">pdp</a> 包的 <code>partial()</code> 函数构建。</p></li>
+<li><p><em>Visualisation (initially contributed by Brandon Greenwell)</em> The <code>stats::termplot()</code> function package can be used to plot the terms in a model whose predict method supports <code>type="terms"</code>. The <a href="https://cran.r-project.org/web/packages/effects/index.html">effects</a> package provides graphical and tabular effect displays for models with a linear predictor (e.g., linear and generalized linear models). Friedman’s partial dependence plots (PDPs), that are low dimensional graphical renderings of the prediction function, are implemented in a few packages. <a href="https://cran.r-project.org/web/packages/gbm/index.html">gbm</a>, <a href="https://cran.r-project.org/web/packages/randomForest/index.html">randomForest</a> and <a href="https://cran.r-project.org/web/packages/randomForestSRC/index.html">randomForestSRC</a> provide their own functions for displaying PDPs, but are limited to the models fit with those packages (the function <code>partialPlot</code> from <a href="https://cran.r-project.org/web/packages/randomForest/index.html">randomForest</a> is more limited since it only allows for one predictor at a time). Packages <a href="https://cran.r-project.org/web/packages/pdp/index.html">pdp</a>, <a href="https://cran.r-project.org/web/packages/plotmo/index.html">plotmo</a>, and <a href="https://cran.r-project.org/web/packages/ICEbox/index.html">ICEbox</a> are more general and allow for the creation of PDPs for a wide variety of machine learning models (e.g., random forests, support vector machines, etc.); both <a href="https://cran.r-project.org/web/packages/pdp/index.html">pdp</a> and <a href="https://cran.r-project.org/web/packages/plotmo/index.html">plotmo</a> support multivariate displays (<a href="https://cran.r-project.org/web/packages/plotmo/index.html">plotmo</a> is limited to two predictors while <a href="https://cran.r-project.org/web/packages/pdp/index.html">pdp</a> uses trellis graphics to display PDPs involving three predictors). By default, <a href="https://cran.r-project.org/web/packages/plotmo/index.html">plotmo</a> fixes the background variables at their medians (or first level for factors) which is faster than constructing PDPs but incorporates less information. <a href="https://cran.r-project.org/web/packages/ICEbox/index.html">ICEbox</a> focuses on constructing individual conditional expectation (ICE) curves, a refinement over Friedman’s PDPs. ICE curves, as well as centered ICE curves can also be constructed with the <code>partial()</code> function from the <a href="https://cran.r-project.org/web/packages/pdp/index.html">pdp</a> package.</p></li>
+</ul>
+</section>
+<section id="可解释人工智能的软件包" class="level3" data-number="4.2.17">
+<h3 data-number="4.2.17" class="anchored" data-anchor-id="可解释人工智能的软件包"><span class="header-section-number">4.2.17</span> 可解释人工智能的软件包</h3>
+<ul>
+<li><p><strong>XAI</strong>： 可解释人工智能（XAI）领域的大多数软件包和函数都属于最后一节“可视化”。元包 <a href="https://cran.r-project.org/web/packages/DALEX/index.html">DALEX</a> 和 <a href="https://cran.r-project.org/web/packages/iml/index.html">iml</a> 提供了解释任何模型的不同方法，包括部分依赖性、累积局部效应和排列重要性。 累积局部效应图也可以直接在 <a href="https://cran.r-project.org/web/packages/ALEPlot/index.html">ALEPlot</a>中获取。 SHAP（来自 <em>SH</em>apley <em>A</em>dditive ex<em>P</em>lanations）是解释ML模型最常用的技术之一。 它以公平的方式将预测分解为预测器的加性贡献。 对于基于树的模型，存在非常快的TreeSHAP算法。 它直接与 <a href="https://cran.r-project.org/web/packages/h2o/index.html">h2o</a>，<a href="https://cran.r-project.org/web/packages/xgboost/index.html">xgboost</a>，和 <a href="https://cran.r-project.org/web/packages/lightgbm/index.html">lightgbm</a> 一起提供。 在额外的包中提供了SHAP的模型不可知实现：<a href="https://cran.r-project.org/web/packages/fastshap/index.html">fastshap</a> 主要使用蒙特卡洛采样来近似SHAP值，而 <a href="https://cran.r-project.org/web/packages/shapr/index.html">shapr</a> 和 <a href="https://cran.r-project.org/web/packages/kernelshap/index.html">kernelshap</a> 提供了KernelSHAP的实现。 这些包的SHAP值可以由<a href="https://cran.r-project.org/web/packages/shapviz/index.html">shapviz</a>包绘制。Python的“shap”包的端口在 <a href="https://cran.r-project.org/web/packages/shapper/index.html">shapper</a>中提供。 预测的替代分解在 <a href="https://cran.r-project.org/web/packages/lime/index.html">lime</a> 和 <a href="https://cran.r-project.org/web/packages/iBreakDown/index.html">iBreakDown</a> 中实现。</p></li>
+<li><p><em>XAI</em> : Most packages and functions from the last section “Visualization” belong to the field of explainable artificial intelligence (XAI). The meta packages <a href="https://cran.r-project.org/web/packages/DALEX/index.html">DALEX</a> and <a href="https://cran.r-project.org/web/packages/iml/index.html">iml</a> offer different methods to interpret any model, including partial dependence, accumulated local effects, and permutation importance. Accumulated local effects plots are also directly available in <a href="https://cran.r-project.org/web/packages/ALEPlot/index.html">ALEPlot</a>. SHAP (from <em>SH</em>apley <em>A</em>dditive ex<em>P</em>lanations) is one of the most frequently used techniques to interpret ML models. It decomposes - in a fair way - predictions into additive contributions of the predictors. For tree-based models, the very fast TreeSHAP algorithm exists. It is shipped directly with <a href="https://cran.r-project.org/web/packages/h2o/index.html">h2o</a>, <a href="https://cran.r-project.org/web/packages/xgboost/index.html">xgboost</a>, and <a href="https://cran.r-project.org/web/packages/lightgbm/index.html">lightgbm</a>. Model-agnostic implementations of SHAP are available in additional packages: <a href="https://cran.r-project.org/web/packages/fastshap/index.html">fastshap</a> mainly uses Monte-Carlo sampling to approximate SHAP values, while <a href="https://cran.r-project.org/web/packages/shapr/index.html">shapr</a> and <a href="https://cran.r-project.org/web/packages/kernelshap/index.html">kernelshap</a> provide implementations of KernelSHAP. SHAP values of any of these packages can be plotted by the package <a href="https://cran.r-project.org/web/packages/shapviz/index.html">shapviz</a>. A port to Python’s “shap” package is provided in <a href="https://cran.r-project.org/web/packages/shapper/index.html">shapper</a>. Alternative decompositions of predictions are implemented in <a href="https://cran.r-project.org/web/packages/lime/index.html">lime</a> and <a href="https://cran.r-project.org/web/packages/iBreakDown/index.html">iBreakDown</a>.</p></li>
+</ul>
+</section>
+</section>
+<section id="一些新的机器学习领域概念" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="一些新的机器学习领域概念"><span class="header-section-number">4.3</span> 一些新的机器学习领域概念</h2>
+<ul>
+<li><p><strong>递归划分</strong>：这是一种构建决策树的方法，它反复将数据集划分为两个或更多的子集，这个过程直到满足某种停止条件（比如，达到预设的最大深度）才会停止。每次划分都是基于特定特征的值。</p></li>
+<li><p><strong>正则化</strong>：正则化是一种用于防止过拟合的技术。通过在损失函数中添加一个惩罚项，可以减小模型复杂度并增强其泛化能力。</p></li>
+<li><p><strong>Boosting</strong>：Boosting 是一种集成学习技术，它结合了多个“弱”分类器以创建一个“强”分类器。Boosting 的工作方式是，在每个训练阶段，都对预测错误的样本进行加权，使得后续的分类器更关注那些被误分类的样本。</p></li>
+<li><p><strong>梯度下降</strong>：梯度下降是一种优化算法，用于寻找目标函数（如损失函数或成本函数）的最小值。它通过计算当前点的负梯度来迭代地更新参数值，并向着函数值下降最快的方向移动。</p></li>
+<li><p><strong>支持向量机</strong>：支持向量机 (SVM) 是一种分类和回归方法。在二分类问题中，SVM 试图找到一个超平面，能够最大化两个类别之间的边界。</p></li>
+<li><p><strong>核方法</strong>：核方法是一种在更高维的特征空间中进行计算的技巧，而无需显式地计算数据点在这个空间中的表示。它常用于支持向量机等算法。</p></li>
+<li><p><strong>贝叶斯方法</strong>：贝叶斯方法基于贝叶斯定理，将先验知识与观察到的数据结合起来，得出对未知参数的后验概率分布。</p></li>
+<li><p><strong>遗传算法</strong>：遗传算法是一种模拟自然选择过程的搜索优化算法。它通过在每一代中重复选择、交叉和变异操作，从而在解空间中搜索最优解。</p></li>
+<li><p><strong>模糊规则</strong>：模糊规则系统是一种基于模糊逻辑的系统，用于处理模糊或不确定的信息。它由一组如果-那么的模糊规则组成，并且可以处理连续值输入和输出。</p></li>
+<li><p><strong>因果分析</strong>：因果分析是一种研究因果关系的方法。在机器学习中，它涉及使用强大的统计工具（如 Granger 因果性测试）来识别因果关系，或使用建立在潜在因果关系模型基础上的算法（比如 Pearl’s do-calculus）来进行预测。</p></li>
+<li><p><strong>XAI（可解释的人工智能）</strong>：这是一个研究领域，旨在让人工智能（AI）决策过程变得可以理解和解释。尽管许多现代AI模型（如深度学习）在各种任务上表现出色，但它们往往被视为“黑箱”，因为我们很难理解它们是如何做出具体决策的。XAI的目标是揭示模型内部的复杂机制，并提供有关模型决策的透明、可理解且可信赖的解释。这不仅有助于提高用户对AI系统的信任，也有助于开发者更好地理解模型的行为，从而进行调试和改进。实现XAI的方法包括特征重要性分析、模型可视化、对抗性例证生成、局部可解释性模型（如LIME）等。</p></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./13.tidymodels-extra.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Extra tidymodels</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./15.tidymodels-recipes.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">特征工程</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>

@@ -1,0 +1,2006 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>R Models - 1&nbsp; Basic tidymodels</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./12.tidymodels-advanced.html" rel="next">
+<link href="./10.tidymodels-intro.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<meta name="mermaid-theme" content="forest">
+<script src="site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
+
+</head>
+
+<body class="nav-sidebar floating">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./10.tidymodels-intro.html">Machine Learning with Tidymodels</a></li><li class="breadcrumb-item"><a href="./11.tidymodels-basic.html"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Basic tidymodels</span></a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">R Models</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./10.tidymodels-intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Machine Learning with Tidymodels</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./11.tidymodels-basic.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Basic tidymodels</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./12.tidymodels-advanced.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Advanced tidymodels</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./13.tidymodels-extra.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Extra tidymodels</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./14.tidymodels-list.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">常见模型和软件包</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./15.tidymodels-recipes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">特征工程</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./30.tidymodels-example.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Example of tidymodels</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="./20.data-mining.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data mining with R</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./21.house-price-pred-lm.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Linear Model For House Price Predication</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <span class="sidebar-item-text sidebar-link text-start">
+ <span class="menu-text">Summary</span></span>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./95.references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#安装需要的软件包" id="toc-安装需要的软件包" class="nav-link active" data-scroll-target="#安装需要的软件包"><span class="header-section-number">1.1</span> 安装需要的软件包</a></li>
+  <li><a href="#数据预处理" id="toc-数据预处理" class="nav-link" data-scroll-target="#数据预处理"><span class="header-section-number">1.2</span> 数据预处理</a>
+  <ul class="collapse">
+  <li><a href="#拆分数据" id="toc-拆分数据" class="nav-link" data-scroll-target="#拆分数据"><span class="header-section-number">1.2.1</span> 拆分数据</a></li>
+  </ul></li>
+  <li><a href="#模型的结构" id="toc-模型的结构" class="nav-link" data-scroll-target="#模型的结构"><span class="header-section-number">1.3</span> 模型的结构</a>
+  <ul class="collapse">
+  <li><a href="#模型与引擎的差异" id="toc-模型与引擎的差异" class="nav-link" data-scroll-target="#模型与引擎的差异"><span class="header-section-number">1.3.1</span> 模型与引擎的差异</a></li>
+  </ul></li>
+  <li><a href="#开始建模" id="toc-开始建模" class="nav-link" data-scroll-target="#开始建模"><span class="header-section-number">1.4</span> 开始建模</a>
+  <ul class="collapse">
+  <li><a href="#逻辑回归模型" id="toc-逻辑回归模型" class="nav-link" data-scroll-target="#逻辑回归模型"><span class="header-section-number">1.4.1</span> 逻辑回归模型</a></li>
+  <li><a href="#决策树" id="toc-决策树" class="nav-link" data-scroll-target="#决策树"><span class="header-section-number">1.4.2</span> 决策树</a></li>
+  <li><a href="#将模型整合为-workflow" id="toc-将模型整合为-workflow" class="nav-link" data-scroll-target="#将模型整合为-workflow"><span class="header-section-number">1.4.3</span> 将模型整合为 workflow</a></li>
+  <li><a href="#使用模型预测" id="toc-使用模型预测" class="nav-link" data-scroll-target="#使用模型预测"><span class="header-section-number">1.4.4</span> 使用模型预测</a></li>
+  <li><a href="#解释模型" id="toc-解释模型" class="nav-link" data-scroll-target="#解释模型"><span class="header-section-number">1.4.5</span> 解释模型</a></li>
+  </ul></li>
+  <li><a href="#模型的评价" id="toc-模型的评价" class="nav-link" data-scroll-target="#模型的评价"><span class="header-section-number">1.5</span> 模型的评价</a>
+  <ul class="collapse">
+  <li><a href="#混淆矩阵" id="toc-混淆矩阵" class="nav-link" data-scroll-target="#混淆矩阵"><span class="header-section-number">1.5.1</span> 混淆矩阵</a></li>
+  <li><a href="#准确性" id="toc-准确性" class="nav-link" data-scroll-target="#准确性"><span class="header-section-number">1.5.2</span> 准确性</a></li>
+  <li><a href="#敏感性" id="toc-敏感性" class="nav-link" data-scroll-target="#敏感性"><span class="header-section-number">1.5.3</span> 敏感性</a></li>
+  <li><a href="#特异性" id="toc-特异性" class="nav-link" data-scroll-target="#特异性"><span class="header-section-number">1.5.4</span> 特异性</a></li>
+  <li><a href="#roc-曲线" id="toc-roc-曲线" class="nav-link" data-scroll-target="#roc-曲线"><span class="header-section-number">1.5.5</span> ROC 曲线</a></li>
+  <li><a href="#过拟合" id="toc-过拟合" class="nav-link" data-scroll-target="#过拟合"><span class="header-section-number">1.5.6</span> 过拟合</a></li>
+  <li><a href="#交叉验证" id="toc-交叉验证" class="nav-link" data-scroll-target="#交叉验证"><span class="header-section-number">1.5.7</span> 交叉验证</a></li>
+  </ul></li>
+  <li><a href="#随机森林模型" id="toc-随机森林模型" class="nav-link" data-scroll-target="#随机森林模型"><span class="header-section-number">1.6</span> 随机森林模型</a></li>
+  <li><a href="#模型的调优" id="toc-模型的调优" class="nav-link" data-scroll-target="#模型的调优"><span class="header-section-number">1.7</span> 模型的调优</a>
+  <ul class="collapse">
+  <li><a href="#为什么要调优" id="toc-为什么要调优" class="nav-link" data-scroll-target="#为什么要调优"><span class="header-section-number">1.7.1</span> 为什么要调优？</a></li>
+  <li><a href="#适用的情况" id="toc-适用的情况" class="nav-link" data-scroll-target="#适用的情况"><span class="header-section-number">1.7.2</span> 适用的情况</a></li>
+  <li><a href="#常见策略" id="toc-常见策略" class="nav-link" data-scroll-target="#常见策略"><span class="header-section-number">1.7.3</span> 常见策略</a></li>
+  <li><a href="#调优模型" id="toc-调优模型" class="nav-link" data-scroll-target="#调优模型"><span class="header-section-number">1.7.4</span> 调优模型</a></li>
+  </ul></li>
+  <li><a href="#参考资料" id="toc-参考资料" class="nav-link" data-scroll-target="#参考资料"><span class="header-section-number">1.8</span> 参考资料</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Basic tidymodels</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching packages ────────────────────────────────────── tidymodels 1.1.1 ──</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ broom        1.0.5     ✔ recipes      1.0.9
+✔ dials        1.2.0     ✔ rsample      1.2.0
+✔ dplyr        1.1.4     ✔ tibble       3.2.1
+✔ ggplot2      3.4.4     ✔ tidyr        1.3.0
+✔ infer        1.0.5     ✔ tune         1.1.2
+✔ modeldata    1.2.0     ✔ workflows    1.1.3
+✔ parsnip      1.1.1     ✔ workflowsets 1.0.1
+✔ purrr        1.0.2     ✔ yardstick    1.2.0</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Conflicts ───────────────────────────────────────── tidymodels_conflicts() ──
+✖ purrr::discard() masks scales::discard()
+✖ dplyr::filter()  masks stats::filter()
+✖ dplyr::lag()     masks stats::lag()
+✖ recipes::step()  masks stats::step()
+• Learn how to get started at https://www.tidymodels.org/start/</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+在继续之前，你应该
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>会使用 R 语言中的管道命令 <code>%&gt;%</code> 或者 <code>|&gt;</code></li>
+<li>用过这几个软件包：<code>dplyr</code>, <code>tidyr</code>, <code>ggplot2</code></li>
+<li>了解基本的统计学概念</li>
+<li>现在不懂，但是想学习模型或者机器学习</li>
+</ul>
+</div>
+</div>
+<p>基础的 tidymodels 知识包括下面几点：</p>
+<ul>
+<li>数据预处理</li>
+<li>模型的结构</li>
+<li>模型的评价</li>
+<li>模型的调优</li>
+</ul>
+<div id="fig-tidymodels-workflow" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+ A(全部数据) --&gt; B1(训练数据集)
+ A --&gt; B2(测试数据集)
+ B1 --&gt; F(最佳模型)
+ B1 --&gt; C(重采样)
+ C --&gt; D1(logistics 回归)
+ C --&gt; D2[决策树]
+ C --&gt; D3[随机森林]
+ D1 --&gt; E{选择模型}
+ D2 --&gt; E
+ D3 --&gt; E
+ E --&gt; F[最佳模型]
+ F --&gt; G[验证模型性能]
+ B2 --&gt; G
+</pre>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="figure-caption">Figure&nbsp;1.1: 建模流程图</figcaption>
+</figure>
+</div>
+<section id="安装需要的软件包" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="安装需要的软件包"><span class="header-section-number">1.1</span> 安装需要的软件包</h2>
+<p>安装下面的这些软件包，以便完成上面列举的任务。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install the packages for the workshop</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>pkgs <span class="ot">&lt;-</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="st">"bonsai"</span>, <span class="st">"doParallel"</span>, <span class="st">"embed"</span>, <span class="st">"finetune"</span>, <span class="st">"lightgbm"</span>, <span class="st">"lme4"</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"plumber"</span>, <span class="st">"probably"</span>, <span class="st">"ranger"</span>, <span class="st">"rpart"</span>, <span class="st">"rpart.plot"</span>, <span class="st">"rules"</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"splines2"</span>, <span class="st">"stacks"</span>, <span class="st">"text2vec"</span>, <span class="st">"textrecipes"</span>, <span class="st">"tidymodels"</span>, </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"vetiver"</span>, <span class="st">"remotes"</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>pak<span class="sc">::</span><span class="fu">pak</span>(pkgs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="数据预处理" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="数据预处理"><span class="header-section-number">1.2</span> 数据预处理</h2>
+<p><code>modeldata</code> 包提供了一些示例数据集，用于在 <code>tidymodels</code> 中进行模型建设和演示。其中 “taxi” 数据集是一个简化的示例数据集，描述了芝加哥出租车司机获得小费的情况。</p>
+<p>其详细信息可以使用以下代码查看：</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(modeldata)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>taxi</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,000 × 7
+   tip   distance company                      local dow   month  hour
+   &lt;fct&gt;    &lt;dbl&gt; &lt;fct&gt;                        &lt;fct&gt; &lt;fct&gt; &lt;fct&gt; &lt;int&gt;
+ 1 yes      17.2  Chicago Independents         no    Thu   Feb      16
+ 2 yes       0.88 City Service                 yes   Thu   Mar       8
+ 3 yes      18.1  other                        no    Mon   Feb      18
+ 4 yes      20.7  Chicago Independents         no    Mon   Apr       8
+ 5 yes      12.2  Chicago Independents         no    Sun   Mar      21
+ 6 yes       0.94 Sun Taxi                     yes   Sat   Apr      23
+ 7 yes      17.5  Flash Cab                    no    Fri   Mar      12
+ 8 yes      17.7  other                        no    Sun   Jan       6
+ 9 yes       1.85 Taxicab Insurance Agency Llc no    Fri   Apr      12
+10 yes       1.47 City Service                 no    Tue   Mar      14
+# ℹ 9,990 more rows</code></pre>
+</div>
+</div>
+<p>包含的变量有：</p>
+<ul>
+<li><code>tip</code>：乘客是否留下小费。 “yes” 或 “no”。</li>
+<li><code>distance</code>：行程距离，以英里为单位。</li>
+<li><code>company</code>：出租车公司。出现次数较少的公司被分为 “other”。</li>
+<li><code>local</code>：行程是否在同一社区区域开始和结束。</li>
+<li><code>dow</code>：行程开始的星期几。</li>
+<li><code>month</code>：行程开始的月份。</li>
+<li><code>hour</code>：行程开始的小时。</li>
+</ul>
+<p>这个数据一共有 10000 行。</p>
+<section id="拆分数据" class="level3" data-number="1.2.1">
+<h3 data-number="1.2.1" class="anchored" data-anchor-id="拆分数据"><span class="header-section-number">1.2.1</span> 拆分数据</h3>
+<p>在机器学习中，数据集主要分为以下几种类型：</p>
+<ol type="1">
+<li><strong>训练集（Training Set）：</strong>
+<ul>
+<li><strong>定义：</strong> 用于训练模型的数据集。</li>
+<li><strong>作用：</strong> 模型通过训练集学习特征和模式，调整参数以最小化预测错误。</li>
+</ul></li>
+<li><strong>验证集（Validation Set）：</strong>
+<ul>
+<li><strong>定义：</strong> 用于调整模型超参数、选择模型或防止过拟合的数据集。</li>
+<li><strong>作用：</strong> 通过在验证集上评估模型性能，进行超参数调整和模型选择。</li>
+</ul></li>
+<li><strong>测试集（Test Set）：</strong>
+<ul>
+<li><strong>定义：</strong> 用于评估模型在未见过的数据上的性能的数据集。</li>
+<li><strong>作用：</strong> 测试集提供了模型在真实场景中的泛化能力的估计。</li>
+</ul></li>
+</ol>
+<p>使用 <code>initial_split()</code> 将数据拆分成训练集和测试集。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rsample)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># random split</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>(taxi_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(taxi))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;Training/Testing/Total&gt;
+&lt;7500/2500/10000&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># access to split data</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>(taxi_train <span class="ot">&lt;-</span> <span class="fu">training</span>(taxi_split))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7,500 × 7
+   tip   distance company                   local dow   month  hour
+   &lt;fct&gt;    &lt;dbl&gt; &lt;fct&gt;                     &lt;fct&gt; &lt;fct&gt; &lt;fct&gt; &lt;int&gt;
+ 1 yes       0.7  Taxi Affiliation Services yes   Tue   Mar      18
+ 2 yes       0.99 Sun Taxi                  yes   Tue   Jan       8
+ 3 yes       1.78 other                     no    Sat   Mar      22
+ 4 yes       0    Taxi Affiliation Services yes   Wed   Apr      15
+ 5 yes       0    Taxi Affiliation Services no    Sun   Jan      21
+ 6 yes       2.3  other                     no    Sat   Apr      21
+ 7 yes       6.35 Sun Taxi                  no    Wed   Mar      16
+ 8 yes       2.79 other                     no    Sun   Feb      14
+ 9 yes      16.6  other                     no    Sun   Apr      18
+10 yes       0.02 Chicago Independents      yes   Sun   Apr      15
+# ℹ 7,490 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>(taxi_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(taxi_split))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2,500 × 7
+   tip   distance company                      local dow   month  hour
+   &lt;fct&gt;    &lt;dbl&gt; &lt;fct&gt;                        &lt;fct&gt; &lt;fct&gt; &lt;fct&gt; &lt;int&gt;
+ 1 yes       0.94 Sun Taxi                     yes   Sat   Apr      23
+ 2 yes       1    Taxi Affiliation Services    no    Mon   Feb      18
+ 3 yes       1.91 Flash Cab                    no    Wed   Apr      15
+ 4 yes       1.1  Chicago Independents         no    Sat   Mar      10
+ 5 yes      11.7  other                        no    Wed   Mar      18
+ 6 yes      17.8  City Service                 no    Mon   Mar       9
+ 7 yes       0.53 Taxicab Insurance Agency Llc yes   Wed   Apr       8
+ 8 yes       1.14 City Service                 no    Wed   Mar      14
+ 9 yes       1.77 other                        no    Thu   Apr      15
+10 yes      18.6  Flash Cab                    no    Thu   Apr      12
+# ℹ 2,490 more rows</code></pre>
+</div>
+</div>
+<p>使用 <code>initial_validation_split()</code> 将数据拆分成训练集、验证集和测试集。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>(<span class="at">taxi_split_2 =</span> <span class="fu">initial_validation_split</span>(taxi, <span class="at">prop =</span> <span class="fu">c</span>(<span class="fl">0.6</span>, <span class="fl">0.2</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;Training/Validation/Testing/Total&gt;
+&lt;6000/2000/2000/10000&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">training</span>(taxi_split_2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6,000 × 7
+   tip   distance company                      local dow   month  hour
+   &lt;fct&gt;    &lt;dbl&gt; &lt;fct&gt;                        &lt;fct&gt; &lt;fct&gt; &lt;fct&gt; &lt;int&gt;
+ 1 yes      17.2  Chicago Independents         no    Thu   Feb      16
+ 2 yes      20.7  Chicago Independents         no    Mon   Apr       8
+ 3 yes      12.2  Chicago Independents         no    Sun   Mar      21
+ 4 yes       1.85 Taxicab Insurance Agency Llc no    Fri   Apr      12
+ 5 yes       0.53 Sun Taxi                     no    Tue   Mar      18
+ 6 yes      16.8  Sun Taxi                     no    Wed   Apr      12
+ 7 yes       0.86 other                        no    Tue   Feb      13
+ 8 no        0.4  other                        yes   Fri   Mar      17
+ 9 yes       0.1  Taxi Affiliation Services    no    Sun   Apr      10
+10 yes       1.6  Taxi Affiliation Services    no    Tue   Apr       8
+# ℹ 5,990 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">testing</span>(taxi_split_2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2,000 × 7
+   tip   distance company                      local dow   month  hour
+   &lt;fct&gt;    &lt;dbl&gt; &lt;fct&gt;                        &lt;fct&gt; &lt;fct&gt; &lt;fct&gt; &lt;int&gt;
+ 1 yes       0.88 City Service                 yes   Thu   Mar       8
+ 2 yes       1.47 City Service                 no    Tue   Mar      14
+ 3 yes       1    other                        no    Fri   Mar      17
+ 4 yes       1.35 Taxicab Insurance Agency Llc no    Thu   Feb      17
+ 5 yes       1.14 City Service                 no    Wed   Mar      14
+ 6 yes       1.77 other                        no    Thu   Apr      15
+ 7 no        1.07 Sun Taxi                     no    Fri   Feb      15
+ 8 no        1.13 other                        no    Sat   Feb      14
+ 9 yes      12.1  Chicago Independents         no    Tue   Jan      11
+10 yes       1.91 Sun Taxi                     no    Tue   Jan      17
+# ℹ 1,990 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">validation</span>(taxi_split_2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2,000 × 7
+   tip   distance company                      local dow   month  hour
+   &lt;fct&gt;    &lt;dbl&gt; &lt;fct&gt;                        &lt;fct&gt; &lt;fct&gt; &lt;fct&gt; &lt;int&gt;
+ 1 yes      18.1  other                        no    Mon   Feb      18
+ 2 yes       0.94 Sun Taxi                     yes   Sat   Apr      23
+ 3 yes      17.5  Flash Cab                    no    Fri   Mar      12
+ 4 yes      17.7  other                        no    Sun   Jan       6
+ 5 yes       6.65 Taxicab Insurance Agency Llc no    Sun   Apr      11
+ 6 yes       1.21 Sun Taxi                     yes   Thu   Apr      19
+ 7 yes       1    Taxi Affiliation Services    no    Mon   Feb      18
+ 8 yes       1.91 Flash Cab                    no    Wed   Apr      15
+ 9 yes       1.1  Chicago Independents         no    Sat   Mar      10
+10 no        0.96 Taxicab Insurance Agency Llc no    Mon   Apr       8
+# ℹ 1,990 more rows</code></pre>
+</div>
+</div>
+<p>使用函数的 <code>strata</code>、<code>prop</code> 参数，以及 <code>initial_time_split()</code>、<code>group_initial_split()</code> 等函数，可以实现更科学的随机分组。</p>
+</section>
+</section>
+<section id="模型的结构" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="模型的结构"><span class="header-section-number">1.3</span> 模型的结构</h2>
+<p>在 R 中使用 <code>tidymodels</code> 进行建模的基本步骤如下：</p>
+<ol type="1">
+<li><strong>选择模型：</strong>
+<ul>
+<li>选择适合任务的模型，例如线性回归、决策树、随机森林等。</li>
+</ul></li>
+<li><strong>指定引擎：</strong>
+<ul>
+<li>指定模型使用的引擎，如 “lm” 或 “glmnet”。</li>
+</ul></li>
+<li><strong>设置模型模式：</strong>
+<ul>
+<li>设置模型的模式，是用于分类还是回归。</li>
+</ul></li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Models</strong> have default engines.</p>
+<p><strong>Some</strong> models have a default mode.</p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 使用默认引擎的逻辑回归模型</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">logistic_reg</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Logistic Regression Model Specification (classification)
+
+Computational engine: glm </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 使用 glmnet 引擎的逻辑回归模型</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">logistic_reg</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"glmnet"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Logistic Regression Model Specification (classification)
+
+Computational engine: glmnet </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 使用 stan 引擎的逻辑回归模型</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">logistic_reg</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"stan"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Logistic Regression Model Specification (classification)
+
+Computational engine: stan </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 未指定模式的决策树</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decision_tree</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Decision Tree Model Specification (unknown mode)
+
+Computational engine: rpart </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 指定分类模式的决策树</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">decision_tree</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Decision Tree Model Specification (classification)
+
+Computational engine: rpart </code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>All available models are listed at <a href="https://www.tidymodels.org/find/parsnip/" class="uri">https://www.tidymodels.org/find/parsnip/</a></p>
+</div>
+</div>
+<section id="模型与引擎的差异" class="level3" data-number="1.3.1">
+<h3 data-number="1.3.1" class="anchored" data-anchor-id="模型与引擎的差异"><span class="header-section-number">1.3.1</span> 模型与引擎的差异</h3>
+<p>在 <code>tidymodels</code> 中，模型和计算引擎是分开的。这允许你使用相同的模型规格，但可以选择用于训练模型的不同算法或程序包。</p>
+<p><strong>模型引擎</strong>是指用于实现特定类型模型的软件（通常是一个R包）。例如，对于线性回归模型，可能的引擎包括<code>"lm"</code>、<code>"glmnet"</code>、<code>"spark"</code>等，每个都对应不同的实现方法。</p>
+<p>不同的引擎可能会有以下几种差异：</p>
+<ol type="1">
+<li><strong>计算效率</strong>：一些引擎可能在大数据集上更有效率，而其他引擎在小数据集上可能更快。</li>
+<li><strong>功能</strong>：一些引擎可能只支持某些特定的功能。例如，<code>"glmnet"</code>引擎支持L1和L2正则化，而<code>"lm"</code>引擎则不支持。</li>
+<li><strong>可扩展性</strong>：某些引擎（如<code>"spark"</code>）可能被设计为可以在分布式计算环境中运行，从而处理大规模数据集。</li>
+<li><strong>结果</strong>：由于采用的优化算法和随机初始化等因素的影响，不同引擎可能会得到略微不同的结果。</li>
+</ol>
+<p>总的来说，选择哪个引擎并没有固定的答案，取决于具体的需求和环境。你可能需要根据计算资源、数据大小和模型复杂性等因素来选择最适合的引擎。</p>
+<p>例如，下面使用两种不同的ß引擎创建了随机森林模型。</p>
+<p>在 <code>tidymodels</code> 中，创建随机森林模型规格可以使用 <code>rand_forest()</code> 函数。但是，具体的训练过程会由你选择的计算引擎决定。下面是两个例子，分别说明了如何使用 <code>"ranger"</code> 引擎和 <code>"randomForest"</code> 引擎。</p>
+<ol type="1">
+<li>使用 <code>"ranger"</code> 引擎：</li>
+</ol>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 创建模型规格</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>rf_spec <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">mtry =</span> <span class="dv">10</span>, <span class="at">trees =</span> <span class="dv">1000</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_engine</span>(<span class="st">"ranger"</span>, <span class="at">importance =</span> <span class="st">'impurity'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 训练模型</span></span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>rf_fit <span class="ot">&lt;-</span> rf_spec <span class="sc">%&gt;%</span> <span class="fu">fit</span>(Class <span class="sc">~</span> ., <span class="at">data =</span> your_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>在这里，我们设置了 <code>mtry = 10</code>（即每个树节点考虑的变量数）和 <code>trees = 1000</code>（生成的树的数量）。然后我们指定了引擎为 <code>"ranger"</code>。<code>ranger</code> 包提供了一个参数 <code>importance</code>，用于计算变量重要性（这里我们设为 ‘impurity’，表示计算基于不纯度的变量重要性）。</p>
+<ol start="2" type="1">
+<li>使用 <code>"randomForest"</code> 引擎：</li>
+</ol>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 创建模型规格</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>rf_spec <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">mtry =</span> <span class="dv">10</span>, <span class="at">trees =</span> <span class="dv">1000</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_engine</span>(<span class="st">"randomForest"</span>, <span class="at">importance =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>   <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 训练模型</span></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>rf_fit <span class="ot">&lt;-</span> rf_spec <span class="sc">%&gt;%</span> <span class="fu">fit</span>(Class <span class="sc">~</span> ., <span class="at">data =</span> your_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>在这个例子中，我们指定了引擎为 <code>"randomForest"</code>。<code>randomForest</code> 包提供了一个参数 <code>importance</code>，如果设置为 <code>TRUE</code>，则计算变量重要性。</p>
+<p>两个引擎的主要区别在于：</p>
+<ul>
+<li><code>"ranger"</code> 引擎通常比 <code>"randomForest"</code> 引擎更快，且能处理更大的数据集。</li>
+<li><code>"ranger"</code> 引擎提供了更多的选项来计算变量重要性。</li>
+</ul>
+<p>最终的模型结果可能会有些微小的差异，因为这两个包在实现随机森林时使用了不同的方法和优化技术。</p>
+</section>
+</section>
+<section id="开始建模" class="level2" data-number="1.4">
+<h2 data-number="1.4" class="anchored" data-anchor-id="开始建模"><span class="header-section-number">1.4</span> 开始建模</h2>
+<p>使用 2 种模型对 <code>taxi</code> 数据进行建模。</p>
+<ul>
+<li>Logistic regression</li>
+<li>Decision trees</li>
+</ul>
+<section id="逻辑回归模型" class="level3" data-number="1.4.1">
+<h3 data-number="1.4.1" class="anchored" data-anchor-id="逻辑回归模型"><span class="header-section-number">1.4.1</span> 逻辑回归模型</h3>
+<p>逻辑回归模型将事件概率的对数几率（logit）建模为预测变量的线性组合：</p>
+<p><span class="math display">
+\log\left(\frac{p}{1 - p}\right) = \beta_0 + \beta_1 \cdot A
+</span></p>
+<p>在这里：</p>
+<ul>
+<li><span class="math inline">p</span> 是事件发生的概率，</li>
+<li><span class="math inline">\beta_0</span> 是截距，</li>
+<li><span class="math inline">\beta_1</span> 是与预测变量 <span class="math inline">A</span> 相关的系数。</li>
+</ul>
+</section>
+<section id="决策树" class="level3" data-number="1.4.2">
+<h3 data-number="1.4.2" class="anchored" data-anchor-id="决策树"><span class="header-section-number">1.4.2</span> 决策树</h3>
+<p>使用决策树建模。</p>
+<ul>
+<li><p>基于预测变量的一系列划分或 if/then 语句：</p></li>
+<li><p>首先，树会在满足某些条件之前（如达到最大深度或没有更多数据时）不断地“生长”（grow）。</p></li>
+<li><p>然后，为了降低树的复杂性，树会被“修剪”（pruned）。</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>tree_fit <span class="ot">&lt;-</span> <span class="fu">decision_tree</span>(<span class="at">mode =</span> <span class="st">"classification"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(class <span class="sc">~</span> A, <span class="at">data =</span> <span class="fu">mutate</span>(dat, <span class="at">class =</span> forcats<span class="sc">::</span><span class="fu">fct_rev</span>(class)))</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>tree_preds <span class="ot">&lt;-</span> <span class="fu">augment</span>(tree_fit, <span class="at">new_data =</span> bin_midpoints)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rpart.plot)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>载入需要的程辑包：rpart</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+载入程辑包：'rpart'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:dials':
+
+    prune</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>tree_fit <span class="sc">%&gt;%</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rpart.plot</span>(<span class="at">roundint =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="11.tidymodels-basic_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>建模的效果如下：</p>
+<div class="callout callout-style-default callout-caution callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Caution
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>All models are wrong, but some are useful!</p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-model-comparison" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="11.tidymodels-basic_files/figure-html/fig-model-comparison-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;1.2: 逻辑回归模型与决策树的预测结果示意。（A）通过逻辑函数（S形函数），找到一条分隔两个类别的曲线。当 <span class="math inline">p</span> 大于 0.5 时，预测的类别为 1；否则，为 0。 S 形曲线的形状实现了两个类别之间的平滑过渡。（B）使用决策树建模。</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="将模型整合为-workflow" class="level3" data-number="1.4.3">
+<h3 data-number="1.4.3" class="anchored" data-anchor-id="将模型整合为-workflow"><span class="header-section-number">1.4.3</span> 将模型整合为 workflow</h3>
+<p>使用 <code>workflow()</code> 有一些明显的优势（<a href="#fig-workflow">Figure&nbsp;<span>1.3</span></a>）。</p>
+<ul>
+<li><p>Workflow 在处理新数据方面比基本的 R 工具更加灵活，尤其是在涉及新的因子水平时：这在处理分类变量时尤为重要。</p></li>
+<li><p>可以使用更多的数据预处理器来提取特征（在高级 tidymodels 中更多关于特征提取的内容！）</p></li>
+<li><p>便于同时处理多个模型。</p></li>
+<li><p>最重要的是，Workflow 涵盖了整个建模过程：<code>fit()</code> 和 <code>predict()</code> 不仅适用于模型拟合，还适用于预处理步骤。</p></li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Workflow 如何更好地处理因子水平
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>强制执行不允许在预测时出现新因子水平的规定（可以关闭）</li>
+<li>恢复在拟合时存在但在预测时缺失的因子水平</li>
+</ul>
+</div>
+</div>
+<div id="fig-workflow" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="https://vnote-1251564393.cos.ap-chengdu.myqcloud.com/picgo/202312301710141.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;1.3: Workflows bind preprocessors and models</figcaption>
+</figure>
+</div>
+<p><strong>经典方法</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>tree_spec <span class="ot">&lt;-</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">decision_tree</span>(<span class="at">cost_complexity =</span> <span class="fl">0.002</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>tree_spec <span class="sc">%&gt;%</span> </span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(tip <span class="sc">~</span> ., <span class="at">data =</span> taxi_train) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>parsnip model object
+
+n= 7500 
+
+node), split, n, loss, yval, (yprob)
+      * denotes terminal node
+
+ 1) root 7500 579 yes (0.92280000 0.07720000)  
+   2) distance&gt;=11.805 2169  83 yes (0.96173352 0.03826648) *
+   3) distance&lt; 11.805 5331 496 yes (0.90695929 0.09304071)  
+     6) distance&lt; 5.405 5061 419 yes (0.91721004 0.08278996) *
+     7) distance&gt;=5.405 270  77 yes (0.71481481 0.28518519)  
+      14) company=Chicago Independents,City Service,Sun Taxi,Taxicab Insurance Agency Llc,other 181  38 yes (0.79005525 0.20994475) *
+      15) company=Flash Cab,Taxi Affiliation Services 89  39 yes (0.56179775 0.43820225)  
+        30) dow=Sun,Mon,Wed,Thu,Sat 59  17 yes (0.71186441 0.28813559) *
+        31) dow=Tue,Fri 30   8 no (0.26666667 0.73333333) *</code></pre>
+</div>
+</div>
+<p><strong>workflow方法</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>tree_spec <span class="ot">&lt;-</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">decision_tree</span>(<span class="at">cost_complexity =</span> <span class="fl">0.002</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 建立一个 workflow，同时保存模型参数，表达式和数据</span></span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_formula</span>(tip <span class="sc">~</span> .) <span class="sc">%&gt;%</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(tree_spec) <span class="sc">%&gt;%</span></span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> taxi_train) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>══ Workflow [trained] ══════════════════════════════════════════════════════════
+Preprocessor: Formula
+Model: decision_tree()
+
+── Preprocessor ────────────────────────────────────────────────────────────────
+tip ~ .
+
+── Model ───────────────────────────────────────────────────────────────────────
+n= 7500 
+
+node), split, n, loss, yval, (yprob)
+      * denotes terminal node
+
+ 1) root 7500 579 yes (0.92280000 0.07720000)  
+   2) distance&gt;=11.805 2169  83 yes (0.96173352 0.03826648) *
+   3) distance&lt; 11.805 5331 496 yes (0.90695929 0.09304071)  
+     6) distance&lt; 5.405 5061 419 yes (0.91721004 0.08278996) *
+     7) distance&gt;=5.405 270  77 yes (0.71481481 0.28518519)  
+      14) company=Chicago Independents,City Service,Sun Taxi,Taxicab Insurance Agency Llc,other 181  38 yes (0.79005525 0.20994475) *
+      15) company=Flash Cab,Taxi Affiliation Services 89  39 yes (0.56179775 0.43820225)  
+        30) dow=Sun,Mon,Wed,Thu,Sat 59  17 yes (0.71186441 0.28813559) *
+        31) dow=Tue,Fri 30   8 no (0.26666667 0.73333333) *</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 或者写在一起</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">workflow</span>(tip <span class="sc">~</span> ., tree_spec) <span class="sc">%&gt;%</span> </span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> taxi_train) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>══ Workflow [trained] ══════════════════════════════════════════════════════════
+Preprocessor: Formula
+Model: decision_tree()
+
+── Preprocessor ────────────────────────────────────────────────────────────────
+tip ~ .
+
+── Model ───────────────────────────────────────────────────────────────────────
+n= 7500 
+
+node), split, n, loss, yval, (yprob)
+      * denotes terminal node
+
+ 1) root 7500 579 yes (0.92280000 0.07720000)  
+   2) distance&gt;=11.805 2169  83 yes (0.96173352 0.03826648) *
+   3) distance&lt; 11.805 5331 496 yes (0.90695929 0.09304071)  
+     6) distance&lt; 5.405 5061 419 yes (0.91721004 0.08278996) *
+     7) distance&gt;=5.405 270  77 yes (0.71481481 0.28518519)  
+      14) company=Chicago Independents,City Service,Sun Taxi,Taxicab Insurance Agency Llc,other 181  38 yes (0.79005525 0.20994475) *
+      15) company=Flash Cab,Taxi Affiliation Services 89  39 yes (0.56179775 0.43820225)  
+        30) dow=Sun,Mon,Wed,Thu,Sat 59  17 yes (0.71186441 0.28813559) *
+        31) dow=Tue,Fri 30   8 no (0.26666667 0.73333333) *</code></pre>
+</div>
+</div>
+<p><em>Edit this code to make a workflow with your own model of choice.</em></p>
+<p><em>Extension/Challenge: Other than formulas, what kinds of preprocessors are supported?</em></p>
+</section>
+<section id="使用模型预测" class="level3" data-number="1.4.4">
+<h3 data-number="1.4.4" class="anchored" data-anchor-id="使用模型预测"><span class="header-section-number">1.4.4</span> 使用模型预测</h3>
+<p>推荐使用 <code>augment()</code> 方法进行预测，与传统的 <code>predict()</code> 相比的差异如下。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>tree_fit <span class="ot">&lt;-</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">workflow</span>(tip <span class="sc">~</span> ., tree_spec) <span class="sc">%&gt;%</span> </span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> taxi_train) </span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="fu">predict</span>(tree_fit, <span class="at">new_data =</span> taxi_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2,500 × 1
+   .pred_class
+   &lt;fct&gt;      
+ 1 yes        
+ 2 yes        
+ 3 yes        
+ 4 yes        
+ 5 yes        
+ 6 yes        
+ 7 yes        
+ 8 yes        
+ 9 yes        
+10 yes        
+# ℹ 2,490 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">augment</span>(tree_fit, <span class="at">new_data =</span> taxi_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2,500 × 10
+   tip   distance company local dow   month  hour .pred_class .pred_yes .pred_no
+   &lt;fct&gt;    &lt;dbl&gt; &lt;fct&gt;   &lt;fct&gt; &lt;fct&gt; &lt;fct&gt; &lt;int&gt; &lt;fct&gt;           &lt;dbl&gt;    &lt;dbl&gt;
+ 1 yes       0.94 Sun Ta… yes   Sat   Apr      23 yes             0.917   0.0828
+ 2 yes       1    Taxi A… no    Mon   Feb      18 yes             0.917   0.0828
+ 3 yes       1.91 Flash … no    Wed   Apr      15 yes             0.917   0.0828
+ 4 yes       1.1  Chicag… no    Sat   Mar      10 yes             0.917   0.0828
+ 5 yes      11.7  other   no    Wed   Mar      18 yes             0.790   0.210 
+ 6 yes      17.8  City S… no    Mon   Mar       9 yes             0.962   0.0383
+ 7 yes       0.53 Taxica… yes   Wed   Apr       8 yes             0.917   0.0828
+ 8 yes       1.14 City S… no    Wed   Mar      14 yes             0.917   0.0828
+ 9 yes       1.77 other   no    Thu   Apr      15 yes             0.917   0.0828
+10 yes      18.6  Flash … no    Thu   Apr      12 yes             0.962   0.0383
+# ℹ 2,490 more rows</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>预测结果在一个 tibble 中；</li>
+<li>列名和数据类型更加清晰和易于理解；</li>
+<li>行数和输出结果的行数是相同的，确保了数据的对应关系。</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="解释模型" class="level3" data-number="1.4.5">
+<h3 data-number="1.4.5" class="anchored" data-anchor-id="解释模型"><span class="header-section-number">1.4.5</span> 解释模型</h3>
+<p>使用 <code>extract_*()</code> 函数提取模型 workflow 对象的组件。如 <a href="#fig-plot-tree-fit">Figure&nbsp;<span>1.4</span></a> 展示了上面决策树模型的分类过程。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rpart.plot)</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>tree_fit <span class="sc">%&gt;%</span></span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_fit_engine</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rpart.plot</span>(<span class="at">roundint =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-plot-tree-fit" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="11.tidymodels-basic_files/figure-html/fig-plot-tree-fit-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;1.4: 决策树的决策过程</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>You can use your fitted workflow for model and/or prediction explanations:</p>
+<ul>
+<li><p>overall variable importance, such as with the <a href="https://koalaverse.github.io/vip/">vip</a> package</p></li>
+<li><p>flexible model explainers, such as with the <a href="https://dalex.drwhy.ai/">DALEXtra</a> package</p></li>
+</ul>
+</section>
+</section>
+<section id="模型的评价" class="level2" data-number="1.5">
+<h2 data-number="1.5" class="anchored" data-anchor-id="模型的评价"><span class="header-section-number">1.5</span> 模型的评价</h2>
+<p>先训练一个决策树模型，然后再评价该模型的性能。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>taxi_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(taxi, <span class="at">prop =</span> <span class="fl">0.8</span>, <span class="at">strata =</span> tip)</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>taxi_train <span class="ot">&lt;-</span> <span class="fu">training</span>(taxi_split)</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>taxi_test <span class="ot">&lt;-</span> <span class="fu">testing</span>(taxi_split)</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>tree_spec <span class="ot">&lt;-</span> <span class="fu">decision_tree</span>(<span class="at">cost_complexity =</span> <span class="fl">0.0001</span>, <span class="at">mode =</span> <span class="st">"classification"</span>)</span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>taxi_wflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>(tip <span class="sc">~</span> ., tree_spec)</span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>taxi_fit <span class="ot">&lt;-</span> <span class="fu">fit</span>(taxi_wflow, taxi_train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="混淆矩阵" class="level3" data-number="1.5.1">
+<h3 data-number="1.5.1" class="anchored" data-anchor-id="混淆矩阵"><span class="header-section-number">1.5.1</span> 混淆矩阵</h3>
+<p>混淆矩阵将真实值和预测值以热图的形成呈现出来。</p>
+<div class="cell" data-fig.asp="0.5">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(forcats)</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>p1 <span class="ot">=</span> <span class="fu">augment</span>(taxi_fit, <span class="at">new_data =</span> taxi_train) <span class="sc">%&gt;%</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">conf_mat</span>(<span class="at">truth =</span> tip, <span class="at">estimate =</span> .pred_class) <span class="sc">%&gt;%</span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>(<span class="at">type =</span> <span class="st">"heatmap"</span>) <span class="sc">+</span></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_equal</span>()</span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 阳性与阴性</span></span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>df <span class="ot">=</span> <span class="fu">tibble</span>(<span class="at">Truth =</span> <span class="fu">as_factor</span>(<span class="fu">c</span>(<span class="st">"yes"</span>,<span class="st">"yes"</span>,<span class="st">"no"</span>,<span class="st">"no"</span>)),</span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a><span class="at">Prediction =</span> <span class="fu">as_factor</span>(<span class="fu">c</span>(<span class="st">"no"</span>,<span class="st">"yes"</span>,<span class="st">"no"</span>,<span class="st">"yes"</span>)),</span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a><span class="at">label =</span> <span class="fu">c</span>(<span class="st">"FN"</span>,<span class="st">"TP"</span>,<span class="st">"TN"</span>,<span class="st">"FP"</span>))</span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a>p2 <span class="ot">=</span> <span class="fu">ggplot</span>(df, <span class="fu">aes</span>(Truth, Prediction, <span class="at">label =</span> label)) <span class="sc">+</span></span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_tile</span>(<span class="at">fill =</span> <span class="st">"grey90"</span>, <span class="at">color =</span> <span class="st">"grey"</span>, <span class="at">linewidth =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb51-14"><a href="#cb51-14" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_text</span>() <span class="sc">+</span></span>
+<span id="cb51-15"><a href="#cb51-15" aria-hidden="true" tabindex="-1"></a><span class="fu">coord_equal</span>() <span class="sc">+</span></span>
+<span id="cb51-16"><a href="#cb51-16" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_minimal</span>()</span>
+<span id="cb51-17"><a href="#cb51-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-18"><a href="#cb51-18" aria-hidden="true" tabindex="-1"></a>aplot<span class="sc">::</span><span class="fu">plot_list</span>(p1, p2, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"A"</span>,<span class="st">"B"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-conf-mat-plot" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="11.tidymodels-basic_files/figure-html/fig-conf-mat-plot-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;1.5: 混淆矩阵</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="准确性" class="level3" data-number="1.5.2">
+<h3 data-number="1.5.2" class="anchored" data-anchor-id="准确性"><span class="header-section-number">1.5.2</span> 准确性</h3>
+<p>根据 <a href="#eq-predict-accuracy">Equation&nbsp;<span>1.1</span></a> 可以计算准确性为 0.927625。</p>
+<p><span id="eq-predict-accuracy"><span class="math display">
+accuracy = \frac{TP + TN}{TP+FP+TN+FN}
+\tag{1.1}</span></span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="fu">augment</span>(taxi_fit, <span class="at">new_data =</span> taxi_train) <span class="sc">%&gt;%</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">accuracy</span>(<span class="at">truth =</span> tip, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  .metric  .estimator .estimate
+  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
+1 accuracy binary         0.928</code></pre>
+</div>
+</div>
+</section>
+<section id="敏感性" class="level3" data-number="1.5.3">
+<h3 data-number="1.5.3" class="anchored" data-anchor-id="敏感性"><span class="header-section-number">1.5.3</span> 敏感性</h3>
+<p>根据 <a href="#eq-predict-sensitivity">Equation&nbsp;<span>1.2</span></a> 可以计算其数值为 0.9941766。</p>
+<p><span id="eq-predict-sensitivity"><span class="math display">
+sensitivity = \frac{TP}{TP+FP}
+\tag{1.2}</span></span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">augment</span>(taxi_fit, <span class="at">new_data =</span> taxi_train) <span class="sc">%&gt;%</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sensitivity</span>(<span class="at">truth =</span> tip, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  .metric     .estimator .estimate
+  &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
+1 sensitivity binary         0.994</code></pre>
+</div>
+</div>
+</section>
+<section id="特异性" class="level3" data-number="1.5.4">
+<h3 data-number="1.5.4" class="anchored" data-anchor-id="特异性"><span class="header-section-number">1.5.4</span> 特异性</h3>
+<p>根据 <a href="#eq-predict-specificity">Equation&nbsp;<span>1.3</span></a> 可以计算其数值为 0.1298701。</p>
+<p><span id="eq-predict-specificity"><span class="math display">
+sensitivity = \frac{TP}{TP+FP}
+\tag{1.3}</span></span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">augment</span>(taxi_fit, <span class="at">new_data =</span> taxi_train) <span class="sc">%&gt;%</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">specificity</span>(<span class="at">truth =</span> tip, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  .metric     .estimator .estimate
+  &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
+1 specificity binary         0.130</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>敏感性</strong>告诉我们，测试有多大程度上能够捕捉到真正的阳性实例，即对于实际为阳性的样本，测试有多大可能性能够正确地识别出它们。</li>
+<li><strong>特异性</strong>告诉我们，测试有多大程度上能够正确地排除实际为阴性的样本，即对于实际为阴性的样本，测试有多大可能性能够正确地将它们识别为阴性。</li>
+<li><strong>准确率</strong>是一个综合性指标，衡量了分类模型对于所有样本的整体预测准确性。具体而言，它表示模型正确预测的样本在所有样本中的比例。</li>
+</ul>
+</div>
+</div>
+<p>使用 <code>metric_set()</code> 可以一次获取多个指标（另见 <a href="#fig-thresholds">Figure&nbsp;<span>1.6</span></a>）。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>taxi_metrics <span class="ot">&lt;-</span> <span class="fu">metric_set</span>(accuracy, specificity, sensitivity)</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a><span class="fu">augment</span>(taxi_fit, <span class="at">new_data =</span> taxi_train) <span class="sc">%&gt;%</span></span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">taxi_metrics</span>(<span class="at">truth =</span> tip, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  .metric     .estimator .estimate
+  &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
+1 accuracy    binary         0.928
+2 specificity binary         0.130
+3 sensitivity binary         0.994</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-thresholds" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="11.tidymodels-basic_files/figure-html/fig-thresholds-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;1.6: 敏感性和特异性通常是一对矛盾的指标，即提高敏感性可能会降低特异性，反之亦然。在实际应用中，选择哪个指标更重要取决于具体的问题和应用背景。</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="roc-曲线" class="level3" data-number="1.5.5">
+<h3 data-number="1.5.5" class="anchored" data-anchor-id="roc-曲线"><span class="header-section-number">1.5.5</span> ROC 曲线</h3>
+<p>ROC（Receiver Operating Characteristic）曲线是一种用于评估二分类模型性能的图形工具。以下是关于ROC曲线的定义和解释：</p>
+<ol type="1">
+<li><p><strong>定义</strong>：</p>
+<ul>
+<li>ROC曲线是一种以假正例率（False Positive Rate，FPR）为横轴、真正例率（True Positive Rate，TPR或敏感性）为纵轴的图形。它显示了在不同阈值下，模型的真正例率和假正例率之间的权衡关系。</li>
+</ul></li>
+<li><p><strong>绘制方式</strong>：</p>
+<ul>
+<li>在ROC曲线中，横轴表示FPR，纵轴表示TPR。模型的输出概率或分数被用作不同阈值，从而生成一系列的TPR和FPR值。</li>
+</ul></li>
+<li><p><strong>解释</strong>：</p>
+<ul>
+<li>ROC曲线能够展示在不同分类阈值下，模型在识别正例（阳性类别）和负例（阴性类别）方面的性能。理想情况下，ROC曲线越靠近左上角，模型性能越好，因为在那里，TPR较高而FPR较低。</li>
+</ul></li>
+<li><p><strong>AUC值</strong>：</p>
+<ul>
+<li>ROC曲线下的面积（Area Under the Curve，AUC）也是一个常用的性能度量。AUC值越接近1，表示模型性能越好。AUC值为0.5时，表示模型的性能等同于随机猜测。</li>
+</ul></li>
+<li><p><strong>示例</strong>：</p>
+<ul>
+<li>一个理想的ROC曲线会沿着左上角的边缘，最终达到（0, 1）点。一般情况下，ROC曲线在图形上是向左上凸起的。</li>
+</ul></li>
+</ol>
+<p>在实际应用中，ROC曲线和AUC值是评估分类模型性能的重要工具，尤其在处理不同类别分布和不同阈值的情况下。</p>
+<p>given that sensitivity is the true positive rate, and specificity is the true negative rate. Hence <code>1 - specificity</code> is the false positive rate.</p>
+<p>We can use the area under the ROC curve as a classification metric:</p>
+<ul>
+<li>ROC AUC = 1 💯</li>
+<li>ROC AUC = 1/2 😢</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Assumes _first_ factor level is event; there are options to change that</span></span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a><span class="fu">augment</span>(taxi_fit, <span class="at">new_data =</span> taxi_train) <span class="sc">%&gt;%</span> </span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> tip, .pred_yes) <span class="sc">%&gt;%</span></span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span>, <span class="dv">20</span>, <span class="dv">50</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  .threshold specificity sensitivity
+       &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;
+1   -Inf           0         1      
+2      0.783       0.209     0.981  
+3      1           1         0.00135</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">augment</span>(taxi_fit, <span class="at">new_data =</span> taxi_train) <span class="sc">%&gt;%</span> </span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_auc</span>(<span class="at">truth =</span> tip, .pred_yes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 roc_auc binary         0.691</code></pre>
+</div>
+</div>
+<p><a href="#fig-taxi-fit-roc-curve">Figure&nbsp;<span>1.7</span></a> 显示了上面这个模型的 ROC 曲线。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="fu">augment</span>(taxi_fit, <span class="at">new_data =</span> taxi_train) <span class="sc">%&gt;%</span> </span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> tip, .pred_yes) <span class="sc">%&gt;%</span></span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">autoplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div id="fig-taxi-fit-roc-curve" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="11.tidymodels-basic_files/figure-html/fig-taxi-fit-roc-curve-1.png" class="img-fluid figure-img" width="672"></p>
+<figcaption class="figure-caption">Figure&nbsp;1.7: 这个模型的 ROC AUC 值为 0.691。</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="过拟合" class="level3" data-number="1.5.6">
+<h3 data-number="1.5.6" class="anchored" data-anchor-id="过拟合"><span class="header-section-number">1.5.6</span> 过拟合</h3>
+<p>将训练得到的模型分别用于训练数据集和测试数据集，比较二者预测的准确率，可以发现预测训练数据集的结果优于测试数据集。这就是模型的过拟合现象（<a href="#fig-over-fitting">Figure&nbsp;<span>1.8</span></a>）。</p>
+<div id="fig-over-fitting" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="https://raw.githubusercontent.com/topepo/2022-nyr-workshop/main/images/tuning-overfitting-test-1.svg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;1.8: 过拟合</figcaption>
+</figure>
+</div>
+<p>首先，比较一下模型的准确性指标。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 模型预测训练数据集</span></span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>taxi_fit <span class="sc">%&gt;%</span></span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(taxi_train) <span class="sc">%&gt;%</span></span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">accuracy</span>(tip, .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  .metric  .estimator .estimate
+  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
+1 accuracy binary         0.928</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 模型预测测试数据集</span></span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>taxi_fit <span class="sc">%&gt;%</span></span>
+<span id="cb67-3"><a href="#cb67-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(taxi_test) <span class="sc">%&gt;%</span></span>
+<span id="cb67-4"><a href="#cb67-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">accuracy</span>(tip, .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  .metric  .estimator .estimate
+  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
+1 accuracy binary         0.908</code></pre>
+</div>
+</div>
+<p>其次，比较一下 Brier 分数。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>taxi_fit <span class="sc">%&gt;%</span></span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(taxi_train) <span class="sc">%&gt;%</span></span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">brier_class</span>(tip, .pred_yes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  .metric     .estimator .estimate
+  &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
+1 brier_class binary        0.0632</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>taxi_fit <span class="sc">%&gt;%</span></span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(taxi_test) <span class="sc">%&gt;%</span></span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">brier_class</span>(tip, .pred_yes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 3
+  .metric     .estimator .estimate
+  &lt;chr&gt;       &lt;chr&gt;          &lt;dbl&gt;
+1 brier_class binary        0.0782</code></pre>
+</div>
+</div>
+<p>Brier分数（Brier Score）是一种用于评估分类模型性能的指标。对于二分类问题，Brier分数的计算公式如下：</p>
+<p><span class="math display">
+Brier\ Score = \frac{1}{N} \sum_{i=1}^{N} (f_i - o_i)^2
+</span></p>
+<p>其中：</p>
+<ul>
+<li><span class="math inline">N</span> 是样本数；</li>
+<li><span class="math inline">f_i</span> 是模型对事件发生的概率的预测值；</li>
+<li><span class="math inline">o_i</span> 是实际观测到的二分类结果，取值为0或1（例如，事件未发生为0，事件发生为1）。</li>
+</ul>
+<p>Brier分数的取值范围在0到1之间，0表示完美预测，1表示最差的预测。较低的Brier分数表示模型对观测结果的概率预测更准确。所以，仍然可以发现模型过拟合的现象。</p>
+</section>
+<section id="交叉验证" class="level3" data-number="1.5.7">
+<h3 data-number="1.5.7" class="anchored" data-anchor-id="交叉验证"><span class="header-section-number">1.5.7</span> 交叉验证</h3>
+<p>在不使用测试数据集的前提下，能不能比较模型的参数？这就要用到交叉验证。<code>vfold_cv()</code> 函数默认将训练数据集中的十分之一（<code>v = 10</code>）取出来，用于计算、比较模型的性能参数。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>taxi_folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(taxi_train, <span class="at">v =</span> <span class="dv">10</span>, <span class="at">strata =</span> tip)</span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>taxi_folds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>#  10-fold cross-validation using stratification 
+# A tibble: 10 × 2
+   splits             id    
+   &lt;list&gt;             &lt;chr&gt; 
+ 1 &lt;split [7200/800]&gt; Fold01
+ 2 &lt;split [7200/800]&gt; Fold02
+ 3 &lt;split [7200/800]&gt; Fold03
+ 4 &lt;split [7200/800]&gt; Fold04
+ 5 &lt;split [7200/800]&gt; Fold05
+ 6 &lt;split [7200/800]&gt; Fold06
+ 7 &lt;split [7200/800]&gt; Fold07
+ 8 &lt;split [7200/800]&gt; Fold08
+ 9 &lt;split [7200/800]&gt; Fold09
+10 &lt;split [7200/800]&gt; Fold10</code></pre>
+</div>
+</div>
+<p>使用 <code>fit_resamples()</code> 函数来对多次取样的数据进行拟合，使用 <code>collect_mertics()</code> 评价模型的性能。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>taxi_res <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(taxi_wflow, taxi_folds)</span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>taxi_res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Resampling results
+# 10-fold cross-validation using stratification 
+# A tibble: 10 × 4
+   splits             id     .metrics         .notes          
+   &lt;list&gt;             &lt;chr&gt;  &lt;list&gt;           &lt;list&gt;          
+ 1 &lt;split [7200/800]&gt; Fold01 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt;
+ 2 &lt;split [7200/800]&gt; Fold02 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt;
+ 3 &lt;split [7200/800]&gt; Fold03 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt;
+ 4 &lt;split [7200/800]&gt; Fold04 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt;
+ 5 &lt;split [7200/800]&gt; Fold05 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt;
+ 6 &lt;split [7200/800]&gt; Fold06 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt;
+ 7 &lt;split [7200/800]&gt; Fold07 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt;
+ 8 &lt;split [7200/800]&gt; Fold08 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt;
+ 9 &lt;split [7200/800]&gt; Fold09 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt;
+10 &lt;split [7200/800]&gt; Fold10 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>taxi_res <span class="sc">%&gt;%</span></span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">collect_metrics</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 6
+  .metric  .estimator  mean     n std_err .config             
+  &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+1 accuracy binary     0.915    10 0.00309 Preprocessor1_Model1
+2 roc_auc  binary     0.624    10 0.0105  Preprocessor1_Model1</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>collect_metrics()</code> is one of a suite of <code>collect_*()</code> functions that can be used to work with columns of tuning results. Most columns in a tuning result prefixed with <code>.</code> have a corresponding <code>collect_*()</code> function with options for common summaries.</p>
+</div>
+</div>
+<p>交叉验证通过重采样和性能比较，使得我们可以在仅使用训练集就可以可靠地比较模型的性能。</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>记住：</p>
+<ul>
+<li>训练集会给出过于乐观的指标</li>
+<li>测试集非常宝贵</li>
+</ul>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save the assessment set results</span></span>
+<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>ctrl_taxi <span class="ot">&lt;-</span> <span class="fu">control_resamples</span>(<span class="at">save_pred =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>taxi_res <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(taxi_wflow, taxi_folds, <span class="at">control =</span> ctrl_taxi)</span>
+<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a>taxi_res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Resampling results
+# 10-fold cross-validation using stratification 
+# A tibble: 10 × 5
+   splits             id     .metrics         .notes           .predictions
+   &lt;list&gt;             &lt;chr&gt;  &lt;list&gt;           &lt;list&gt;           &lt;list&gt;      
+ 1 &lt;split [7200/800]&gt; Fold01 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 2 &lt;split [7200/800]&gt; Fold02 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 3 &lt;split [7200/800]&gt; Fold03 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 4 &lt;split [7200/800]&gt; Fold04 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 5 &lt;split [7200/800]&gt; Fold05 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 6 &lt;split [7200/800]&gt; Fold06 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 7 &lt;split [7200/800]&gt; Fold07 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 8 &lt;split [7200/800]&gt; Fold08 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 9 &lt;split [7200/800]&gt; Fold09 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+10 &lt;split [7200/800]&gt; Fold10 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Save the assessment set results</span></span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true" tabindex="-1"></a>taxi_preds <span class="ot">&lt;-</span> <span class="fu">collect_predictions</span>(taxi_res)</span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true" tabindex="-1"></a>taxi_preds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8,000 × 7
+   id     .pred_yes .pred_no  .row .pred_class tip   .config             
+   &lt;chr&gt;      &lt;dbl&gt;    &lt;dbl&gt; &lt;int&gt; &lt;fct&gt;       &lt;fct&gt; &lt;chr&gt;               
+ 1 Fold01     0.938   0.0615    14 yes         yes   Preprocessor1_Model1
+ 2 Fold01     0.946   0.0544    19 yes         yes   Preprocessor1_Model1
+ 3 Fold01     0.973   0.0269    33 yes         yes   Preprocessor1_Model1
+ 4 Fold01     0.903   0.0971    43 yes         yes   Preprocessor1_Model1
+ 5 Fold01     0.973   0.0269    74 yes         yes   Preprocessor1_Model1
+ 6 Fold01     0.903   0.0971   103 yes         yes   Preprocessor1_Model1
+ 7 Fold01     0.915   0.0851   104 yes         no    Preprocessor1_Model1
+ 8 Fold01     0.903   0.0971   124 yes         yes   Preprocessor1_Model1
+ 9 Fold01     0.667   0.333    126 yes         yes   Preprocessor1_Model1
+10 Fold01     0.949   0.0510   128 yes         yes   Preprocessor1_Model1
+# ℹ 7,990 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluating model performance</span></span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a>taxi_preds <span class="sc">%&gt;%</span> </span>
+<span id="cb83-3"><a href="#cb83-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">%&gt;%</span></span>
+<span id="cb83-4"><a href="#cb83-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">taxi_metrics</span>(<span class="at">truth =</span> tip, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 30 × 4
+   id     .metric  .estimator .estimate
+   &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
+ 1 Fold01 accuracy binary         0.905
+ 2 Fold02 accuracy binary         0.925
+ 3 Fold03 accuracy binary         0.926
+ 4 Fold04 accuracy binary         0.915
+ 5 Fold05 accuracy binary         0.902
+ 6 Fold06 accuracy binary         0.912
+ 7 Fold07 accuracy binary         0.906
+ 8 Fold08 accuracy binary         0.91 
+ 9 Fold09 accuracy binary         0.918
+10 Fold10 accuracy binary         0.931
+# ℹ 20 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a>taxi_res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Resampling results
+# 10-fold cross-validation using stratification 
+# A tibble: 10 × 5
+   splits             id     .metrics         .notes           .predictions
+   &lt;list&gt;             &lt;chr&gt;  &lt;list&gt;           &lt;list&gt;           &lt;list&gt;      
+ 1 &lt;split [7200/800]&gt; Fold01 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 2 &lt;split [7200/800]&gt; Fold02 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 3 &lt;split [7200/800]&gt; Fold03 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 4 &lt;split [7200/800]&gt; Fold04 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 5 &lt;split [7200/800]&gt; Fold05 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 6 &lt;split [7200/800]&gt; Fold06 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 7 &lt;split [7200/800]&gt; Fold07 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 8 &lt;split [7200/800]&gt; Fold08 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+ 9 &lt;split [7200/800]&gt; Fold09 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    
+10 &lt;split [7200/800]&gt; Fold10 &lt;tibble [2 × 4]&gt; &lt;tibble [0 × 3]&gt; &lt;tibble&gt;    </code></pre>
+</div>
+</div>
+<p>交叉验证的蒙特卡洛方法，以及创建验证数据集。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">322</span>)</span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a><span class="co"># use the Monte Carlo Cross-Validation</span></span>
+<span id="cb87-3"><a href="#cb87-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mc_cv</span>(taxi_train, <span class="at">times =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Monte Carlo cross-validation (0.75/0.25) with 10 resamples  
+# A tibble: 10 × 2
+   splits              id        
+   &lt;list&gt;              &lt;chr&gt;     
+ 1 &lt;split [6000/2000]&gt; Resample01
+ 2 &lt;split [6000/2000]&gt; Resample02
+ 3 &lt;split [6000/2000]&gt; Resample03
+ 4 &lt;split [6000/2000]&gt; Resample04
+ 5 &lt;split [6000/2000]&gt; Resample05
+ 6 &lt;split [6000/2000]&gt; Resample06
+ 7 &lt;split [6000/2000]&gt; Resample07
+ 8 &lt;split [6000/2000]&gt; Resample08
+ 9 &lt;split [6000/2000]&gt; Resample09
+10 &lt;split [6000/2000]&gt; Resample10</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create validation set</span></span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>taxi_val_split <span class="ot">&lt;-</span> <span class="fu">initial_validation_split</span>(taxi, <span class="at">strata =</span> tip)</span>
+<span id="cb89-3"><a href="#cb89-3" aria-hidden="true" tabindex="-1"></a><span class="fu">validation_set</span>(taxi_val_split)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+  splits              id        
+  &lt;list&gt;              &lt;chr&gt;     
+1 &lt;split [6000/2000]&gt; validation</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="随机森林模型" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="随机森林模型"><span class="header-section-number">1.6</span> 随机森林模型</h2>
+<p>在了解了模型评价指标之后，我们再建一个随机森林模型，看看这个模型的性能是不是会优于决策树。</p>
+<p>随机森林（Random Forest）是一种集成学习（Ensemble Learning）方法，用于解决分类和回归问题。它建立在决策树的基础上，通过构建多个决策树并结合它们的预测结果来提高模型的性能和鲁棒性。</p>
+<p>以下是随机森林模型的主要特点和工作原理：</p>
+<ol type="1">
+<li><p><strong>决策树基学习器：</strong> 随机森林由多个决策树组成。每个决策树都是独立训练的，采用不同的随机子集数据。这有助于防止过拟合，增加模型的泛化能力。</p></li>
+<li><p><strong>随机子集（Bootstrap抽样）：</strong> 在训练每个决策树时，随机森林使用自助抽样（Bootstrap Sampling）从训练集中随机选择一个子集。这意味着每个决策树的训练数据都是从原始训练集中有放回地随机抽取的。</p></li>
+<li><p><strong>随机特征选择：</strong> 在每个决策树的节点上，随机森林只考虑特征的随机子集进行划分。这样做有助于确保每个决策树的多样性，防止所有决策树过于相似。</p></li>
+<li><p><strong>投票机制：</strong> 对于分类问题，随机森林通过多数投票原则（Majority Voting）来确定最终的分类结果。对于回归问题，随机森林取多个决策树的平均预测结果。</p></li>
+<li><p><strong>高性能和鲁棒性：</strong> 随机森林通常对于各种类型的数据和问题都表现得很好。它们能够处理大量特征和样本，具有较强的鲁棒性，对于处理噪声和复杂关系也有良好的适应性。</p></li>
+</ol>
+<p>随机森林的主要优势在于其简单而强大的集成学习策略，能够有效地降低过拟合风险，并在许多实际应用中表现优异。由于其可解释性、鲁棒性和高性能，随机森林成为了许多数据科学和机器学习问题的首选模型之一。</p>
+<p>Bootstrap aggregating，通常简称为 Bagging，是一种集成学习的方法，旨在提高模型的稳定性和准确性。它的核心思想是通过对原始数据集进行自助抽样（Bootstrap Sampling），创建多个数据子集，然后分别训练多个模型，最后将它们的预测结果进行组合。</p>
+<p>下面使用随机森林模型建模，并检查得到模型的性能指标。</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="co"># initialize a random forest model</span></span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>rf_spec <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">trees =</span> <span class="dv">1000</span>, <span class="at">mode =</span> <span class="st">"classification"</span>)</span>
+<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a>rf_spec</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Random Forest Model Specification (classification)
+
+Main Arguments:
+  trees = 1000
+
+Computational engine: ranger </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a random forest model (workflow)</span></span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>rf_wflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>(tip <span class="sc">~</span> ., rf_spec)</span>
+<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>rf_wflow</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>══ Workflow ════════════════════════════════════════════════════════════════════
+Preprocessor: Formula
+Model: rand_forest()
+
+── Preprocessor ────────────────────────────────────────────────────────────────
+tip ~ .
+
+── Model ───────────────────────────────────────────────────────────────────────
+Random Forest Model Specification (classification)
+
+Main Arguments:
+  trees = 1000
+
+Computational engine: ranger </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a>ctrl_taxi <span class="ot">&lt;-</span> <span class="fu">control_resamples</span>(<span class="at">save_pred =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Random forest uses random numbers so set the seed first</span></span>
+<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2</span>)</span>
+<span id="cb95-5"><a href="#cb95-5" aria-hidden="true" tabindex="-1"></a>taxi_folds <span class="ot">=</span> <span class="fu">vfold_cv</span>(taxi_train, <span class="at">strata =</span> tip)</span>
+<span id="cb95-6"><a href="#cb95-6" aria-hidden="true" tabindex="-1"></a>rf_res <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(rf_wflow, taxi_folds, <span class="at">control =</span> ctrl_taxi)</span>
+<span id="cb95-7"><a href="#cb95-7" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(rf_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 6
+  .metric  .estimator  mean     n std_err .config             
+  &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+1 accuracy binary     0.923    10 0.00336 Preprocessor1_Model1
+2 roc_auc  binary     0.612    10 0.0178  Preprocessor1_Model1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a><span class="co"># taxi_split has train + test info</span></span>
+<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a>final_fit <span class="ot">&lt;-</span> <span class="fu">last_fit</span>(rf_wflow, taxi_split) </span>
+<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a>final_fit</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Resampling results
+# Manual resampling 
+# A tibble: 1 × 6
+  splits              id               .metrics .notes   .predictions .workflow 
+  &lt;list&gt;              &lt;chr&gt;            &lt;list&gt;   &lt;list&gt;   &lt;list&gt;       &lt;list&gt;    
+1 &lt;split [8000/2000]&gt; train/test split &lt;tibble&gt; &lt;tibble&gt; &lt;tibble&gt;     &lt;workflow&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a><span class="do">## What is in final_fit</span></span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_metrics</span>(final_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 4
+  .metric  .estimator .estimate .config             
+  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
+1 accuracy binary         0.914 Preprocessor1_Model1
+2 roc_auc  binary         0.644 Preprocessor1_Model1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a><span class="co"># metrics computed with the test set</span></span>
+<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a><span class="fu">collect_predictions</span>(final_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2,000 × 7
+   id               .pred_yes .pred_no  .row .pred_class tip   .config          
+   &lt;chr&gt;                &lt;dbl&gt;    &lt;dbl&gt; &lt;int&gt; &lt;fct&gt;       &lt;fct&gt; &lt;chr&gt;            
+ 1 train/test split     0.958  0.0415      4 yes         yes   Preprocessor1_Mo…
+ 2 train/test split     0.931  0.0689     10 yes         yes   Preprocessor1_Mo…
+ 3 train/test split     0.969  0.0313     19 yes         yes   Preprocessor1_Mo…
+ 4 train/test split     0.889  0.111      23 yes         yes   Preprocessor1_Mo…
+ 5 train/test split     0.945  0.0551     28 yes         yes   Preprocessor1_Mo…
+ 6 train/test split     0.981  0.0193     34 yes         yes   Preprocessor1_Mo…
+ 7 train/test split     0.952  0.0476     35 yes         yes   Preprocessor1_Mo…
+ 8 train/test split     0.936  0.0637     38 yes         yes   Preprocessor1_Mo…
+ 9 train/test split     0.991  0.00895    40 yes         yes   Preprocessor1_Mo…
+10 train/test split     0.947  0.0526     42 yes         no    Preprocessor1_Mo…
+# ℹ 1,990 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="do">## What is in final_fit</span></span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a><span class="fu">extract_workflow</span>(final_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>══ Workflow [trained] ══════════════════════════════════════════════════════════
+Preprocessor: Formula
+Model: rand_forest()
+
+── Preprocessor ────────────────────────────────────────────────────────────────
+tip ~ .
+
+── Model ───────────────────────────────────────────────────────────────────────
+Ranger result
+
+Call:
+ ranger::ranger(x = maybe_data_frame(x), y = y, num.trees = ~1000,      num.threads = 1, verbose = FALSE, seed = sample.int(10^5,          1), probability = TRUE) 
+
+Type:                             Probability estimation 
+Number of trees:                  1000 
+Sample size:                      8000 
+Number of independent variables:  6 
+Mtry:                             2 
+Target node size:                 10 
+Variable importance mode:         none 
+Splitrule:                        gini 
+OOB prediction error (Brier s.):  0.07054061 </code></pre>
+</div>
+</div>
+</section>
+<section id="模型的调优" class="level2" data-number="1.7">
+<h2 data-number="1.7" class="anchored" data-anchor-id="模型的调优"><span class="header-section-number">1.7</span> 模型的调优</h2>
+<section id="为什么要调优" class="level3" data-number="1.7.1">
+<h3 data-number="1.7.1" class="anchored" data-anchor-id="为什么要调优"><span class="header-section-number">1.7.1</span> 为什么要调优？</h3>
+<p>模型调整（tuning）是机器学习中的一个重要步骤，主要出于以下几个原因：</p>
+<ol type="1">
+<li><p><strong>提高模型性能</strong>：调整模型参数可以帮助我们找到最优的参数组合，从而使模型在特定任务上实现最佳性能。</p></li>
+<li><p><strong>避免过拟合和欠拟合</strong>：通过适当的模型调整，我们可以平衡模型的偏差和方差，避免过拟合（模型在训练数据上表现良好，但在测试数据上表现差）和欠拟合（模型在训练数据和测试数据上的表现都不好）。</p></li>
+<li><p><strong>适应不同的数据分布</strong>：不同的数据集有其特异性，可能需要不同的参数配置才能达到较好的效果。通过模型调度，我们可以针对具体的数据集优化模型。</p></li>
+<li><p><strong>增加模型的泛化能力</strong>：通过合理的参数设置，可以使模型对未知数据有更好的预测能力。</p></li>
+</ol>
+</section>
+<section id="适用的情况" class="level3" data-number="1.7.2">
+<h3 data-number="1.7.2" class="anchored" data-anchor-id="适用的情况"><span class="header-section-number">1.7.2</span> 适用的情况</h3>
+<p>模型调优主要适用于以下几种情况：</p>
+<ol type="1">
+<li><p><strong>模型性能不佳</strong>：当模型的预测结果或分类效果不尽如人意时，我们需要对模型进行调优以提升其性能。</p></li>
+<li><p><strong>数据集特性变化</strong>：当我们处理的数据集有显著的特性变化（例如特征分布改变，噪声增加等）时，我们需要对原有模型进行调整以适应新的数据特性。</p></li>
+<li><p><strong>模型过拟合或欠拟合</strong>：当模型在训练集上表现良好，但在测试集上表现较差（过拟合），或者模型在训练集和测试集上的表现都不佳（欠拟合）时，我们需要通过调整模型参数来解决这些问题。</p></li>
+<li><p><strong>初始参数设置不合理</strong>：如果模型的初始参数设置并不合适，可能会导致模型的学习效率较低或者无法到达最优解，此时需要对模型进行调优。</p></li>
+<li><p><strong>针对特定任务优化模型</strong>：当我们希望模型在某个特定任务上有更好的表现时，我们可以对模型做针对性的调优。</p></li>
+</ol>
+<p>总的来说，只要是希望提升模型性能，适应数据变化，或者解决模型的过拟合和欠拟合问题，我们都可以通过模型调优来实现。</p>
+</section>
+<section id="常见策略" class="level3" data-number="1.7.3">
+<h3 data-number="1.7.3" class="anchored" data-anchor-id="常见策略"><span class="header-section-number">1.7.3</span> 常见策略</h3>
+<p>最常见的模型调优策略主要有以下几种：</p>
+<ol type="1">
+<li><p><strong>网格搜索（Grid Search）</strong>：这是一种穷举搜索的方法，我们为每一个参数设定一组值，然后通过遍历每个参数可能的组合来寻找最优解。</p></li>
+<li><p><strong>随机搜索（Random Search）</strong>：不同于网格搜索的穷举性质，它在每个参数的可能值中随机选取一部分进行组合，然后从这些组合中寻找最优解。</p></li>
+<li><p><strong>手动搜索（Manual Search）</strong>：也称为人工搜索，即由研究者根据经验或者对问题的理解，手动设定并调整参数。这种方式需要有一定的专业知识和经验，但在某些情况下可能会找到更好的解。</p></li>
+<li><p><strong>自动化搜索（Automated Search）</strong>：这类方法，如贝叶斯优化、遗传算法等，使用算法自动寻找最优参数组合。相比前面几种方法，这些方法可以在更大的范围内寻找最优参数，并且节省了人工参与调整的时间。</p></li>
+</ol>
+<p>以上就是目前最常用的模型调优策略，选择哪种策略依赖于具体的需求、问题复杂度以及可用资源。</p>
+</section>
+<section id="调优模型" class="level3" data-number="1.7.4">
+<h3 data-number="1.7.4" class="anchored" data-anchor-id="调优模型"><span class="header-section-number">1.7.4</span> 调优模型</h3>
+<p><code>tune_grid()</code> works similar to <code>fit_resamples()</code> but covers multiple parameter values:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1"></a>rf_spec <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">min_n =</span> <span class="fu">tune</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb105-2"><a href="#cb105-2"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span>
+<span id="cb105-3"><a href="#cb105-3"></a></span>
+<span id="cb105-4"><a href="#cb105-4"></a>rf_wflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>(tip <span class="sc">~</span> ., rf_spec)</span>
+<span id="cb105-5"><a href="#cb105-5"></a>rf_wflow</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>══ Workflow ════════════════════════════════════════════════════════════════════
+Preprocessor: Formula
+Model: rand_forest()
+
+── Preprocessor ────────────────────────────────────────────────────────────────
+tip ~ .
+
+── Model ───────────────────────────────────────────────────────────────────────
+Random Forest Model Specification (classification)
+
+Main Arguments:
+  min_n = tune()
+
+Computational engine: ranger </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1"></a><span class="do">## Try out multiple values</span></span>
+<span id="cb107-2"><a href="#cb107-2"></a><span class="fu">set.seed</span>(<span class="dv">22</span>)</span>
+<span id="cb107-3"><a href="#cb107-3"></a>rf_res <span class="ot">&lt;-</span> <span class="fu">tune_grid</span>(</span>
+<span id="cb107-4"><a href="#cb107-4"></a>  rf_wflow,</span>
+<span id="cb107-5"><a href="#cb107-5"></a>  taxi_folds,</span>
+<span id="cb107-6"><a href="#cb107-6"></a>  <span class="at">grid =</span> <span class="dv">5</span></span>
+<span id="cb107-7"><a href="#cb107-7"></a>)</span>
+<span id="cb107-8"><a href="#cb107-8"></a></span>
+<span id="cb107-9"><a href="#cb107-9"></a><span class="do">## Compare results</span></span>
+<span id="cb107-10"><a href="#cb107-10"></a><span class="co"># Inspecting results and selecting the best-performing hyperparameter(s):</span></span>
+<span id="cb107-11"><a href="#cb107-11"></a><span class="fu">show_best</span>(rf_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: No value of `metric` was given; metric 'roc_auc' will be used.</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 7
+  min_n .metric .estimator  mean     n std_err .config             
+  &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+1    33 roc_auc binary     0.620    10  0.0157 Preprocessor1_Model1
+2    31 roc_auc binary     0.619    10  0.0163 Preprocessor1_Model3
+3    21 roc_auc binary     0.614    10  0.0169 Preprocessor1_Model4
+4     6 roc_auc binary     0.613    10  0.0180 Preprocessor1_Model2
+5    13 roc_auc binary     0.608    10  0.0186 Preprocessor1_Model5</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb110"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1"></a>best_parameter <span class="ot">&lt;-</span> <span class="fu">select_best</span>(rf_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: No value of `metric` was given; metric 'roc_auc' will be used.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb112"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1"></a>best_parameter</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+  min_n .config             
+  &lt;int&gt; &lt;chr&gt;               
+1    33 Preprocessor1_Model1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb114"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1"></a><span class="do">## The final fit</span></span>
+<span id="cb114-2"><a href="#cb114-2"></a>(rf_wflow <span class="ot">&lt;-</span> <span class="fu">finalize_workflow</span>(rf_wflow, best_parameter))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>══ Workflow ════════════════════════════════════════════════════════════════════
+Preprocessor: Formula
+Model: rand_forest()
+
+── Preprocessor ────────────────────────────────────────────────────────────────
+tip ~ .
+
+── Model ───────────────────────────────────────────────────────────────────────
+Random Forest Model Specification (classification)
+
+Main Arguments:
+  min_n = 33
+
+Computational engine: ranger </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb116"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1"></a>(final_fit <span class="ot">&lt;-</span> <span class="fu">last_fit</span>(rf_wflow, taxi_split))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Resampling results
+# Manual resampling 
+# A tibble: 1 × 6
+  splits              id               .metrics .notes   .predictions .workflow 
+  &lt;list&gt;              &lt;chr&gt;            &lt;list&gt;   &lt;list&gt;   &lt;list&gt;       &lt;list&gt;    
+1 &lt;split [8000/2000]&gt; train/test split &lt;tibble&gt; &lt;tibble&gt; &lt;tibble&gt;     &lt;workflow&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1"></a><span class="fu">collect_metrics</span>(final_fit)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 4
+  .metric  .estimator .estimate .config             
+  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
+1 accuracy binary         0.913 Preprocessor1_Model1
+2 roc_auc  binary         0.648 Preprocessor1_Model1</code></pre>
+</div>
+</div>
+<p>这段代码是在使用 <code>tidymodels</code> 包中的函数进行随机森林模型的参数调优和最后的拟合。下面是对各个部分的解释：</p>
+<ol type="1">
+<li><p><code>rf_spec &lt;- rand_forest(min_n = tune()) %&gt;% set_mode("classification")</code></p>
+<p>这行代码定义了一个随机森林分类器，并设定 <code>min_n</code> 参数为待调整的参数。</p></li>
+<li><p><code>rf_wflow &lt;- workflow(tip ~ ., rf_spec)</code></p>
+<p>这行代码创建了一个工作流，将特征和模型规格结合起来。</p></li>
+<li><p><code>rf_res &lt;- tune_grid(rf_wflow, taxi_folds, grid = 5)</code></p>
+<p>这行代码使用 <code>tune_grid</code> 函数在预定义的交叉验证折叠 <code>taxi_folds</code> 上进行网格搜索，尝试 <code>grid=5</code> 指定的不同的 <code>min_n</code> 参数值。</p></li>
+<li><p><code>show_best(rf_res)</code></p>
+<p>这行代码显示了最佳性能的模型参数。</p></li>
+<li><p><code>best_parameter &lt;- select_best(rf_res)</code></p>
+<p>这行代码选择出表现最好的模型参数。</p></li>
+<li><p><code>rf_wflow &lt;- finalize_workflow(rf_wflow, best_parameter)</code></p>
+<p>这行代码将最佳参数设置到工作流中。</p></li>
+<li><p><code>final_fit &lt;- last_fit(rf_wflow, taxi_split)</code></p>
+<p>这行代码在训练集上用确定的最佳参数进行最后的模型拟合。</p></li>
+<li><p><code>collect_metrics(final_fit)</code></p>
+<p>这行代码收集并显示最终模型在训练集和测试集上的性能指标。</p></li>
+</ol>
+</section>
+</section>
+<section id="参考资料" class="level2" data-number="1.8">
+<h2 data-number="1.8" class="anchored" data-anchor-id="参考资料"><span class="header-section-number">1.8</span> 参考资料</h2>
+<ul>
+<li><p><a href="https://www.tidymodels.org/" class="uri">https://www.tidymodels.org/</a></p></li>
+<li><p><a href="https://www.tmwr.org/" class="uri">https://www.tmwr.org/</a></p></li>
+<li><p><a href="http://www.feat.engineering/" class="uri">http://www.feat.engineering/</a></p></li>
+<li><p><a href="https://smltar.com/" class="uri">https://smltar.com/</a></p></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./10.tidymodels-intro.html" class="pagination-link">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Machine Learning with Tidymodels</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./12.tidymodels-advanced.html" class="pagination-link">
+        <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Advanced tidymodels</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+</body></html>
