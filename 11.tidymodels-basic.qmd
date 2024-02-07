@@ -171,6 +171,62 @@ decision_tree() %>%
 All available models are listed at <https://www.tidymodels.org/find/parsnip/> 
 :::
 
+### 模型与引擎的差异
+
+在 `tidymodels` 中，模型和计算引擎是分开的。这允许你使用相同的模型规格，但可以选择用于训练模型的不同算法或程序包。
+
+**模型引擎**是指用于实现特定类型模型的软件（通常是一个R包）。例如，对于线性回归模型，可能的引擎包括`"lm"`、`"glmnet"`、`"spark"`等，每个都对应不同的实现方法。
+
+不同的引擎可能会有以下几种差异：
+
+1. **计算效率**：一些引擎可能在大数据集上更有效率，而其他引擎在小数据集上可能更快。
+2. **功能**：一些引擎可能只支持某些特定的功能。例如，`"glmnet"`引擎支持L1和L2正则化，而`"lm"`引擎则不支持。
+3. **可扩展性**：某些引擎（如`"spark"`）可能被设计为可以在分布式计算环境中运行，从而处理大规模数据集。
+4. **结果**：由于采用的优化算法和随机初始化等因素的影响，不同引擎可能会得到略微不同的结果。
+
+总的来说，选择哪个引擎并没有固定的答案，取决于具体的需求和环境。你可能需要根据计算资源、数据大小和模型复杂性等因素来选择最适合的引擎。
+
+例如，下面使用两种不同的ß引擎创建了随机森林模型。
+
+在 `tidymodels` 中，创建随机森林模型规格可以使用 `rand_forest()` 函数。但是，具体的训练过程会由你选择的计算引擎决定。下面是两个例子，分别说明了如何使用 `"ranger"` 引擎和 `"randomForest"` 引擎。
+
+1. 使用 `"ranger"` 引擎：
+
+```r
+library(tidymodels)
+
+# 创建模型规格
+rf_spec <- rand_forest(mtry = 10, trees = 1000) %>%
+   set_engine("ranger", importance = 'impurity') %>%
+   set_mode("classification")
+
+# 训练模型
+rf_fit <- rf_spec %>% fit(Class ~ ., data = your_data)
+```
+
+在这里，我们设置了 `mtry = 10`（即每个树节点考虑的变量数）和 `trees = 1000`（生成的树的数量）。然后我们指定了引擎为 `"ranger"`。`ranger` 包提供了一个参数 `importance`，用于计算变量重要性（这里我们设为 'impurity'，表示计算基于不纯度的变量重要性）。
+
+2. 使用 `"randomForest"` 引擎：
+
+```r
+# 创建模型规格
+rf_spec <- rand_forest(mtry = 10, trees = 1000) %>%
+   set_engine("randomForest", importance = TRUE) %>%
+   set_mode("classification")
+
+# 训练模型
+rf_fit <- rf_spec %>% fit(Class ~ ., data = your_data)
+```
+
+在这个例子中，我们指定了引擎为 `"randomForest"`。`randomForest` 包提供了一个参数 `importance`，如果设置为 `TRUE`，则计算变量重要性。
+
+两个引擎的主要区别在于：
+
+- `"ranger"` 引擎通常比 `"randomForest"` 引擎更快，且能处理更大的数据集。
+- `"ranger"` 引擎提供了更多的选项来计算变量重要性。
+
+最终的模型结果可能会有些微小的差异，因为这两个包在实现随机森林时使用了不同的方法和优化技术。
+
 
 ## 开始建模
 
