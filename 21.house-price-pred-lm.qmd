@@ -181,11 +181,12 @@ house_res <-
   house_wflow %>%
   fit_resamples(house_rs, control = ctrl, metrics = reg_metrics)
 
-# 在测试集上预测并评估模型
+# 在测试集上预测并收集结果
 house_test_preds <- house_wflow %>%
   last_fit(house_split) %>%
   collect_predictions(new_data = house_test)
 
+# 输出模型指标
 house_test_results <- house_test_preds %>%
   metrics(truth = price, estimate = .pred)
 
@@ -225,14 +226,49 @@ ggplot(house_test_preds, aes(x = .pred, y = price)) +
 
 2. **查看每次交叉验证的结果**：我们可以绘制一个箱型图，展示每次交叉验证结果的分布。
 
-```r
-house_res %>%
-  collect_metrics() %>%
-  ggplot(aes(x = id, y = mean)) +
-  geom_boxplot() +
-  facet_wrap(~ .metric, scales = "free")
+```{r}
+house_res |> 
+  select(id, .metrics)  |> 
+  unnest(.metrics) %>%
+  ggplot(aes(x = id, y = .estimate)) +
+  geom_col() +
+  facet_wrap(~.metric, ncol = 1)
 ```
 
 在这个图中，每个箱型图代表一次交叉验证的结果（即模型在不同训练/验证集上的表现）。通过查看箱型图，我们可以了解模型性能的稳定性和可靠性。
 
 以上只是一些基本的可视化示例，具体可视化的内容和方式会依据你对数据和任务的理解进行调整。
+
+### 最佳拟合结果
+
+在 `tidymodels` 中，如果你使用了调参（tune）功能寻找最佳的模型超参数，那么可以使用以下方法来获取最佳的拟合结果：
+
+```{r}
+# 获取最佳参数组合
+best_params <- house_res %>%
+  select_best(metric = "mae")
+
+# 使用最佳参数重新拟合模型
+best_fit <- house_wflow %>%
+  finalize_workflow(best_params) %>%
+  last_fit(house_split)
+
+# 提取拟合结果
+fit_result <- best_fit %>% 
+  extract_fit_parsnip()
+
+# 拟合得到的参数
+fit_result %>% tidy()
+
+# 自变量的重要性
+fit_result |> vip::vip()
+```
+
+在上面的代码中：
+- `house_res` 是你在调参过程中得到的结果，包含了所有尝试过的参数组合以及对应的评价指标。
+- `select_best()` 函数用于选择使指定指标达到最优的参数组合。在这个例子中，我们选择使 RMSE 最小的参数组合。
+- `finalize_workflow()` 函数将最佳参数设置到工作流中。
+- `last_fit()` 函数则使用这个参数再次拟合模型。
+
+然后，我们像之前一样使用 `extract_fit_parsnip()` 和 `tidy()` 函数来提取模型拟合结果。此时，`fit_result` 就是一个包含了最佳模型参数的数据框。
+
