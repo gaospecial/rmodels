@@ -2,7 +2,6 @@
 
 ```{r}
 #| label: setup
-#| include: false
 
 # 设置 knitr 选项
 knitr::opts_chunk$set(
